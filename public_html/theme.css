@@ -40,6 +40,12 @@ footer a:visited {
     text-decoration: none;
 }
 
+a {
+    color: #a66;
+}
 a:hover {
-    color: #a88;
+    color: #d88;
+}
+a:visited {
+    color: #666;
 }
