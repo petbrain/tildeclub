@@ -1,0 +1,45 @@
+html {
+    color: #422;
+    background: lightgrey;
+}
+
+header {
+    background: #eee;
+    border-bottom: 1px solid #a88;
+}
+
+header > .badge > a > img,
+header > .logo > h1 {
+    filter: drop-shadow(3px 3px 8px #355) blur(0.5px);
+}
+
+main {
+    background: #f8f8f8;
+}
+
+footer {
+    background: #eee;
+    border-top: 1px solid #a88;
+}
+
+footer .links,
+footer .tildeclub {
+    text-align: center;
+}
+
+footer .links {
+    margin-bottom: 1rem;
+}
+
+header a,
+header a:hover,
+header a:visited,
+footer a,
+footer a:visited {
+    color: #422;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #a88;
+}
