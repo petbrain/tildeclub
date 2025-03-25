@@ -16,7 +16,7 @@ header {
     flex-direction: row;
     white-space: nowrap;
     align-self: center;
-    width: 100%;
+    width: calc(100% - 1rem);
     max-width: 63rem;
     padding: 0.5rem;
 }
@@ -45,13 +45,13 @@ main {
     display: flex;
     flex-direction: column;
     align-self: center;
-    width: 100%;
+    width: calc(100% - 1rem);
     max-width: 63rem;
     padding: 0 0.5rem;
 }
 
 footer {
-    width: 100%;
+    width: calc(100% - 1rem);
     max-width: 63rem;
     flex-shrink: 0;
     align-self: center;
