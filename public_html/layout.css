@@ -34,12 +34,6 @@ header > .logo > h1 {
     font-size: 2rem;
 }
 
-header > .logo > .subscript {
-    margin: 0 1rem;
-    font-size: 0.9rem;
-    text-align: center;
-}
-
 main {
     flex: 1 0 auto;
     display: flex;
