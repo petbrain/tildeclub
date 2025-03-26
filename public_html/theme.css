@@ -13,6 +13,22 @@ header > .logo > h1 {
     filter: drop-shadow(3px 3px 8px #355) blur(0.5px);
 }
 
+header > nav > ul {
+    margin: 0;
+    padding: 0;
+}
+
+header > nav > ul > li {
+    display: inline-block;
+    font-weight: bolder;
+    line-height: 2rem;
+    margin-left: 1rem;
+}
+header > nav > ul > li::before {
+    content: "~";
+    margin-right: 0.5rem;
+}
+
 main {
     background: #f8f8f8;
 }
@@ -43,7 +59,8 @@ footer a:visited {
 a {
     color: #a66;
 }
-a:hover {
+a:hover,
+header > nav > ul > li > a:hover {
     color: #d88;
 }
 a:visited {
