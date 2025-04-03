@@ -25,11 +25,11 @@ header > .badge {
     margin-top: 0.25rem;
 }
 
-header > .logo {
+header > h1 {
     display: inline-block;
 }
 
-header > .logo > h1 {
+header > h1 {
     margin: 0 1rem;
     font-size: 2rem;
     line-height: 2rem;
