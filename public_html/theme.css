@@ -72,3 +72,18 @@ a:focus-visible {
     border-radius: 0.125rem;
     outline-offset: 0.125rem;
 }
+
+.command {
+    font-family: monospace;
+    font-size: 125%;
+    color: #977;
+}
+
+pre {
+    overflow-x: auto;
+    font-size: 125%;
+}
+
+article .date {
+    color: #a88;
+}

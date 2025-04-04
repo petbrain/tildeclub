@@ -52,3 +52,7 @@ footer {
     align-self: center;
     padding: 0.5rem;
 }
+
+.nobreak {
+    white-space: nowrap;
+}
