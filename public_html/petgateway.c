@@ -29,12 +29,15 @@ void print_error(char* fmt, ...)
     if (msg_len == -1) {
         fputs("Out of memory", stdout);
     } else {
-        // escape double quotes and newlines for JSON output
+        // escape double quotes, backslashes, and newlines for JSON output
         for(int i = 0; i < msg_len; i++) {
             char c = msg[i];
             if (c == '"') {
                 putchar('\\');
                 putchar(c);
+            } else if (c == '\\') {
+                putchar('\\');
+                putchar('\\');
             } else if (c == '\n') {
                 putchar('\\');
                 putchar('n');
