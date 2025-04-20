@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="shortcut icon" type="image/png" href="https://tilde.club/favicon.png">
+    <link rel="preload" href="layout.v1.css" as="style">
+    <link rel="preload" href="theme.v1.css" as="style">
+    <link rel="stylesheet" href="layout.v1.css">
+    <link rel="stylesheet" href="theme.v1.css">
+    <link rel="stylesheet" href="hlcode.css">
+    <script src="petgateway.js"></script>
+    <title>tilde.club CGI application with local storage ~ petbrain ~ tilde.club</title>
+</head>
+<body>
+    <header>
+        <div class="badge">
+            <!-- Tilde Club Badge -->
+            <a href="http://tilde.club"><img src="http://tilde.club/~zarate/tildeclub.gif" border="0" width="88" height="31" alt="Tilde Club Badge"></a>
+        </div>
+        <h1><a href="/~petbrain">petbrain</a></h1>
+        <nav>
+            <ul>
+                <li><a href="dump.html">dump</a></li>
+                <li><a href="bookmarks.html">bookmarks</a></li>
+                <li><a href="about.html">about</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <article>
+            <h1>tilde.club CGI application with local storage</h1>
+            <div class="date">2025-04-03</div>
+            <p>
+                It's been a long time since I played with CGI.
+                Tilde club leaves no chance to avoid this forgotten craft.
+            </p>
+            <p>
+                Basically, there was no strong need to write this note.
+                If I, pet, was able find a solution in five minutes,
+                others definitely can do better.
+                But as long as <a href="https://tilde.club/wiki/cgi.html">CGI tutorial</a>
+                does exist, let this be an amendment.
+            </p>
+            <p>
+                I wanted simple log on the server written from client side with JavaScript.
+                Thus, I needed a storage in my home directory writable by CGI
+                program.
+                However, they say that CGI scripts are running with NGNX credentials
+                which means they cannot write to my home directory by default.
+            </p>
+            <p>
+                Home directory has group <span class="command">club</span> and NGINX
+                is not in it.
+                Neither can I set <span class="command">nginx</span> group
+                for particular directory as an unprivileged user.
+            </p>
+            <p>
+                The only way to make a directory writable for CGI is to give
+                these permissions to everyone.
+                I believe tilde.club is a friendly community, but minimal security
+                is worth to apply.
+                It's not complicated, just two points.
+            </p>
+            <p>
+                The very basic thing is putting all publicly writable subdirectories
+                under a directory for which read permissions are disabled, i.e.
+            </p>
+            <pre>
+chmod 701 /home/petbrain/publicly-private
+            </pre>
+            <p>
+                Everyone can go through such directory but cannot list its content.
+                Well-known subdirectories are still vulnerable,
+                but if a subdirectory has long enough random name, it could be a perfect
+                private storage.
+            </p>
+            <p>
+                That's all.
+            </p>
+            <p>
+                Finally, here's my first in this epoch CGI program.
+                It simply appends a record to file and return responses in JSON format.
+            </p>
+            <p>
+                Although my responses contain neither quotes nor newlines,
+                I assume <span class="command">strerror</span> may return anything.
+                For this reason <span class="command">print_error</span> does the minimal escaping.
+            </p>
+<div class="hlcode"><pre><span></span><span class="c1">// for vasprintf:</span>
+<span class="cp">#ifndef _GNU_SOURCE</span>
+<span class="cp">#define _GNU_SOURCE</span>
+<span class="cp">#endif</span>
+
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;errno.h&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdarg.h&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdlib.h&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;string.h&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;time.h&gt;</span>
+
+<span class="kt">char</span><span class="w"> </span><span class="n">log_filename</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;/home/petbrain/public_html/tw.myaw/test/visitors.myaw&quot;</span><span class="p">;</span>
+<span class="c1">//char log_filename[] = &quot;visitors.myaw&quot;;</span>
+
+<span class="k">extern</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">**</span><span class="n">environ</span><span class="p">;</span>
+
+<span class="kt">char</span><span class="w"> </span><span class="n">error_begin</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Status: 500</span><span class="se">\n</span><span class="s">Content-Type: application/json</span><span class="se">\n\n</span><span class="s">{</span><span class="se">\&quot;</span><span class="s">status</span><span class="se">\&quot;</span><span class="s">: </span><span class="se">\&quot;</span><span class="s">error</span><span class="se">\&quot;</span><span class="s">, </span><span class="se">\&quot;</span><span class="s">description</span><span class="se">\&quot;</span><span class="s">: </span><span class="se">\&quot;</span><span class="s">&quot;</span><span class="p">;</span>
+<span class="kt">char</span><span class="w"> </span><span class="n">error_end</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;</span><span class="se">\&quot;</span><span class="s">}</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">print_error</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">fmt</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">fputs</span><span class="p">(</span><span class="n">error_begin</span><span class="p">,</span><span class="w"> </span><span class="n">stdout</span><span class="p">);</span>
+<span class="w">    </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">msg</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">va_list</span><span class="w"> </span><span class="n">ap</span><span class="p">;</span>
+<span class="w">    </span><span class="n">va_start</span><span class="p">(</span><span class="n">ap</span><span class="p">);</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">msg_len</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vasprintf</span><span class="p">(</span><span class="o">&amp;</span><span class="n">msg</span><span class="p">,</span><span class="w"> </span><span class="n">fmt</span><span class="p">,</span><span class="w"> </span><span class="n">ap</span><span class="p">);</span>
+<span class="w">    </span><span class="n">va_end</span><span class="p">(</span><span class="n">ap</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">msg_len</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">-1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">fputs</span><span class="p">(</span><span class="s">&quot;Out of memory&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">stdout</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// escape double quotes and newlines for JSON output</span>
+<span class="w">        </span><span class="k">for</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">msg_len</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kt">char</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">msg</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">c</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="sc">&#39;&quot;&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">putchar</span><span class="p">(</span><span class="sc">&#39;\\&#39;</span><span class="p">);</span>
+<span class="w">                </span><span class="n">putchar</span><span class="p">(</span><span class="n">c</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">c</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">putchar</span><span class="p">(</span><span class="sc">&#39;\\&#39;</span><span class="p">);</span>
+<span class="w">                </span><span class="n">putchar</span><span class="p">(</span><span class="sc">&#39;n&#39;</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">putchar</span><span class="p">(</span><span class="n">c</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="n">free</span><span class="p">(</span><span class="n">msg</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="n">fputs</span><span class="p">(</span><span class="n">error_end</span><span class="p">,</span><span class="w"> </span><span class="n">stdout</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="kt">FILE</span><span class="o">*</span><span class="w"> </span><span class="n">log</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fopen</span><span class="p">(</span><span class="n">log_filename</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;a&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">log</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">print_error</span><span class="p">(</span><span class="s">&quot;Cannot open %s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">log_filename</span><span class="p">);</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="kt">time_t</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">time</span><span class="p">(</span><span class="nb">NULL</span><span class="p">);</span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">tm</span><span class="o">*</span><span class="w"> </span><span class="n">tm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">gmtime</span><span class="p">(</span><span class="o">&amp;</span><span class="n">t</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">tm</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">print_error</span><span class="p">(</span><span class="s">&quot;localtime: %s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">strerror</span><span class="p">(</span><span class="n">errno</span><span class="p">));</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="n">fprintf</span><span class="p">(</span><span class="n">log</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;</span><span class="se">\n</span><span class="s">  - ts::isodate: %04d-%02d-%02dT%02d:%02d:%02dZ</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="n">tm</span><span class="o">-&gt;</span><span class="n">tm_year</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1900</span><span class="p">,</span>
+<span class="w">            </span><span class="n">tm</span><span class="o">-&gt;</span><span class="n">tm_mon</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">            </span><span class="n">tm</span><span class="o">-&gt;</span><span class="n">tm_mday</span><span class="p">,</span><span class="w"> </span><span class="n">tm</span><span class="o">-&gt;</span><span class="n">tm_hour</span><span class="p">,</span><span class="w"> </span><span class="n">tm</span><span class="o">-&gt;</span><span class="n">tm_min</span><span class="p">,</span><span class="w"> </span><span class="n">tm</span><span class="o">-&gt;</span><span class="n">tm_sec</span><span class="p">);</span>
+<span class="w">    </span><span class="n">fprintf</span><span class="p">(</span><span class="n">log</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;    data:</span><span class="se">\n</span><span class="s">      type: log</span><span class="se">\n</span><span class="s">      content:</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="o">**</span><span class="w"> </span><span class="n">env</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">environ</span><span class="p">;;)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">var</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="n">env</span><span class="o">++</span><span class="p">;</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">var</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">nullptr</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="n">fputs</span><span class="p">(</span><span class="s">&quot;        &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">log</span><span class="p">);</span><span class="w">  </span><span class="c1">// indent</span>
+<span class="w">        </span><span class="c1">// print NAME=VALUE as NAME: VALUE</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(;;)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kt">char</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="n">var</span><span class="o">++</span><span class="p">;</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">c</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="k">break</span><span class="p">;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">c</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="sc">&#39;=&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">fputc</span><span class="p">(</span><span class="sc">&#39;:&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">log</span><span class="p">);</span>
+<span class="w">                </span><span class="n">fputc</span><span class="p">(</span><span class="sc">&#39; &#39;</span><span class="p">,</span><span class="w"> </span><span class="n">log</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">fputc</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="w"> </span><span class="n">log</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="n">fputc</span><span class="p">(</span><span class="sc">&#39;\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">log</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="n">fclose</span><span class="p">(</span><span class="n">log</span><span class="p">);</span>
+
+<span class="w">    </span><span class="n">puts</span><span class="p">(</span><span class="s">&quot;Status: 200</span><span class="se">\n</span><span class="s">Content-Type: application/json</span><span class="se">\n\n</span><span class="s">{</span><span class="se">\&quot;</span><span class="s">status</span><span class="se">\&quot;</span><span class="s">: </span><span class="se">\&quot;</span><span class="s">ok</span><span class="se">\&quot;</span><span class="s">}</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+        </article>
+    </main>
+    <footer>
+        <div class="links">
+            ~
+            <a rel="me" href="https://fosstodon.org/@petbrain">Mastodon</a>
+            ~
+            <a href="https://github.com/petbrain">Github</a>
+            ~
+        </div>
+        <div class="tildeclub">
+            <!-- Tilde.Club Ring -->
+            <img src="http://tilde.club/~harper/webring.png" usemap="#notepad.map">
+            <br>
+            Click for the [
+            <a href="http://tilde.club/~harper/link.html?action=random" target="_top">Random page</a> ]
+            <br>
+            Want to join the ring? Click here for
+            <a href="http://tilde.club/~harper/link.html?action=info" target="_top">info</a>.
+            <br>
+            <map name="notepad.map">
+                <area shape="rect" coords="0, 0, 60, 70" target="_top" href="http://tilde.club/~harper/link.html?action=join">
+                <area shape="rect" coords="130, 0, 417, 75" target="_top" href="http://tilde.club/~harper/link.html?action=random">
+                <area shape="rect" coords="465, 0, 549, 75" target="_top" href="http://tilde.club/~harper/link.html?action=join">
+            </map>
+            <!-- Tildeverse Banner Exchange -->
+            <iframe src="https://banner.tildeverse.org/work.php?ID=deepend" width="468" height="60" marginwidth="0" marginheight="0" hspace="0" vspace="0" frameborder="0" scrolling="no" target="_blank"></iframe>
+        </div>
+    </footer>
+</body>
+</html>

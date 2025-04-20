@@ -1,0 +1,89 @@
+html {
+    color: #422;
+    background: lightgrey;
+}
+
+header {
+    background: #eee;
+    border-bottom: 1px solid #a88;
+}
+
+header > .badge > a > img,
+header > h1 {
+    filter: drop-shadow(3px 3px 8px #355) blur(0.5px);
+}
+
+header > nav > ul {
+    margin: 0;
+    padding: 0;
+}
+
+header > nav > ul > li {
+    display: inline-block;
+    font-weight: bolder;
+    line-height: 2rem;
+    margin-left: 1rem;
+}
+header > nav > ul > li::before {
+    content: "~";
+    margin-right: 0.5rem;
+}
+
+main {
+    background: #f8f8f8;
+}
+
+footer {
+    background: #eee;
+    border-top: 1px solid #a88;
+}
+
+footer .links,
+footer .tildeclub {
+    text-align: center;
+}
+
+footer .links {
+    margin-bottom: 1rem;
+}
+
+header a,
+header a:hover,
+header a:visited,
+footer a,
+footer a:visited {
+    color: #422;
+    text-decoration: none;
+}
+
+a {
+    color: #a66;
+}
+a:hover,
+header > nav > ul > li > a:hover {
+    color: #d88;
+}
+a:visited {
+    color: #666;
+}
+
+a:focus-visible {
+    outline: 0.25rem solid rgb(255,128,128,0.3);
+    border-radius: 0.125rem;
+    outline-offset: 0.125rem;
+}
+
+.command {
+    font-family: monospace;
+    font-size: 125%;
+    color: #977;
+}
+
+pre {
+    overflow-x: auto;
+    font-size: 125%;
+}
+
+article .date {
+    color: #a88;
+}
