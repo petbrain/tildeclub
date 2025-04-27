@@ -29,8 +29,7 @@ async function pgw_call()
                     body: JSON.stringify(arguments),
                     headers: {
                         'Content-Type': 'application/json'
-                    },
-                    mode: 'no-cors'
+                    }
                 }
             );
             if (response.status.toString()[0] === '5') {
