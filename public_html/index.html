@@ -9,44 +9,67 @@
     <link rel="stylesheet" href="layout.v1.css">
     <link rel="stylesheet" href="theme.v1.css">
     <script src="petgateway.js"></script>
+    <style>
+        .enter {
+            font-size: 4rem;
+            color: #f0f0f0;
+            font-weight: bold;
+            transition: color 3s ease-in;
+        }
+        .enter-footnote {
+            color: #f0f0f0;
+            transition: color 0.25s ease-in;
+        }
+        .show-enter {
+            color: #600;
+        }
+        .show-enter-footnote {
+            color: #422;
+        }
+    </style>
     <title>petbrain ~ tilde.club</title>
 </head>
 <body>
-    <header>
-        <div class="badge">
-            <!-- Tilde Club Badge -->
-            <a href="http://tilde.club"><img src="http://tilde.club/~zarate/tildeclub.gif" border="0" width="88" height="31" alt="Tilde Club Badge"></a>
+    <main style="align-items: center; justify-content: center">
+        <noscript>
+            <h1>No</h1>
+            <p>
+                You're not admitted to enter.
+            </p>
+        </noscript>
+        <div id="entry" style="display:none; text-align: center">
         </div>
-        <h1><a href="/~petbrain">petbrain</a></h1>
-        <nav>
-            <ul>
-                <li><a href="dump.html">dump</a></li>
-                <li><a href="404club.html">404 club</a></li>
-            </ul>
-        </nav>
-    </header>
-    <main>
-        <article>
-            <h1>Pet projects</h1>
-            <p>
-                <ul>
-                    <li><a href="https://github.com/petbrain/petux">petux</a>: just announcing upcoming project, pet unix</li>
-                    <li><a href="tw.myaw.html">tw.myaw</a>: inspired by <a href="https://twtxt.dev/">twtxt</a>, an extended thing. Currently at planning stage.</li>
-                    <li><a href="https://github.com/petbrain/myaw">MYAW</a>: pet's YAML</li>
-                    <li><a href="https://github.com/petbrain/petway">PetWay</a>: a library for application programming in C</li>
-                    <li><a href="https://github.com/petbrain/pw-curl">pw-curl</a>: PetWay wrapper for Curl and example fetch utility based on PetWay library</li>
-                    <li><a href="https://github.com/petbrain/libpussy">libpussy</a>: pet's collection of essentials</li>
-                </ul>
-            </p>
+        <script>
+            (async () => {
+                var entry = document.getElementById('entry');
 
-            <h1>Notes</h1>
-            <p>
-                <ul>
-                    <li><a href="tildeclub-cgi-app-with-local-storage.html">tilde.club CGI application with local storage</a></li>
-                </ul>
-            </p>
+                var data = await pgw_call('get-content');
+                entry.innerHTML = data.html;
+                entry.style.display = 'block';
+                if (data.title) {
+                    document.title = data.title;
+                }
 
-        </article>
+                var enter = document.getElementById('enter');
+
+                function welcome()
+                {
+                    document.location = 'welcome';
+                }
+
+                function enable_enter()
+                {
+                    enter.addEventListener('click', welcome);
+                    enter.style.cursor = 'pointer';
+
+                    var footnote = document.getElementById('enter-footnote');
+                    footnote.classList.toggle('show-enter-footnote');
+                }
+
+                enter.addEventListener('transitionend', enable_enter, true);
+                setTimeout(() => {enter.classList.toggle('show-enter')}, 2000);
+            })();
+        </script>
     </main>
     <footer>
         <div class="links">
@@ -55,24 +78,6 @@
             ~
             <a href="https://github.com/petbrain">Github</a>
             ~
-        </div>
-        <div class="tildeclub">
-            <!-- Tilde.Club Ring -->
-            <img src="http://tilde.club/~harper/webring.png" usemap="#notepad.map">
-            <br>
-            Click for the [
-            <a href="http://tilde.club/~harper/link.html?action=random" target="_top">Random page</a> ]
-            <br>
-            Want to join the ring? Click here for
-            <a href="http://tilde.club/~harper/link.html?action=info" target="_top">info</a>.
-            <br>
-            <map name="notepad.map">
-                <area shape="rect" coords="0, 0, 60, 70" target="_top" href="http://tilde.club/~harper/link.html?action=join">
-                <area shape="rect" coords="130, 0, 417, 75" target="_top" href="http://tilde.club/~harper/link.html?action=random">
-                <area shape="rect" coords="465, 0, 549, 75" target="_top" href="http://tilde.club/~harper/link.html?action=join">
-            </map>
-            <!-- Tildeverse Banner Exchange -->
-            <iframe src="https://banner.tildeverse.org/work.php?ID=deepend" width="468" height="60" marginwidth="0" marginheight="0" hspace="0" vspace="0" frameborder="0" scrolling="no" target="_blank"></iframe>
         </div>
     </footer>
 </body>

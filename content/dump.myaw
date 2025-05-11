@@ -1,69 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="shortcut icon" type="image/png" href="https://tilde.club/favicon.png">
-    <link rel="preload" href="layout.v1.css" as="style">
-    <link rel="preload" href="theme.v1.css" as="style">
-    <link rel="stylesheet" href="layout.v1.css">
-    <link rel="stylesheet" href="theme.v1.css">
-    <script src="petgateway.js"></script>
-    <title>Dump ~ petbrain ~ tilde.club</title>
-</head>
-<body>
-    <header>
-        <div class="badge">
-            <!-- Tilde Club Badge -->
-            <a href="http://tilde.club"><img src="http://tilde.club/~zarate/tildeclub.gif" border="0" width="88" height="31" alt="Tilde Club Badge"></a>
-        </div>
-        <h1><a href="/~petbrain">petbrain</a></h1>
-        <nav>
-            <ul>
-                <li><a href="dump.html">dump</a></li>
-                <li><a href="404club.html">404 club</a></li>
-            </ul>
-        </nav>
-    </header>
-    <main>
-        <article>
-            <p>
-                Petbrain is virgin clean.
-            </p>
-            <p>
-                Formatted: Thu, April 24 2025.
-            </p>
-            <p>
-                The dump is empty.
-            </p>
-        </article>
-    </main>
-    <footer>
-        <div class="links">
-            ~
-            <a rel="me" href="https://fosstodon.org/@petbrain">Mastodon</a>
-            ~
-            <a href="https://github.com/petbrain">Github</a>
-            ~
-        </div>
-        <div class="tildeclub">
-            <!-- Tilde.Club Ring -->
-            <img src="http://tilde.club/~harper/webring.png" usemap="#notepad.map">
-            <br>
-            Click for the [
-            <a href="http://tilde.club/~harper/link.html?action=random" target="_top">Random page</a> ]
-            <br>
-            Want to join the ring? Click here for
-            <a href="http://tilde.club/~harper/link.html?action=info" target="_top">info</a>.
-            <br>
-            <map name="notepad.map">
-                <area shape="rect" coords="0, 0, 60, 70" target="_top" href="http://tilde.club/~harper/link.html?action=join">
-                <area shape="rect" coords="130, 0, 417, 75" target="_top" href="http://tilde.club/~harper/link.html?action=random">
-                <area shape="rect" coords="465, 0, 549, 75" target="_top" href="http://tilde.club/~harper/link.html?action=join">
-            </map>
-            <!-- Tildeverse Banner Exchange -->
-            <iframe src="https://banner.tildeverse.org/work.php?ID=deepend" width="468" height="60" marginwidth="0" marginheight="0" hspace="0" vspace="0" frameborder="0" scrolling="no" target="_blank"></iframe>
-        </div>
-    </footer>
-</body>
-</html>
+title:
+    Dump ~ petbrain ~ tilde.club
+
+article:
+    html:
+        <p>
+            Petbrain is virgin clean.
+        </p>
+        <p>
+            Formatted: Thu, April 24 2025.
+        </p>
+        <p>
+            The dump is empty.
+        </p>

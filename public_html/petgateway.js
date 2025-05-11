@@ -44,7 +44,3 @@ async function pgw_call()
     }
     return result
 }
-
-(() => {
-    pgw_call('log-visitor');
-})();

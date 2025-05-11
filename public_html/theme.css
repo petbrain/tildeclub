@@ -8,7 +8,6 @@ header {
     border-bottom: 1px solid #a88;
 }
 
-header > .badge > a > img,
 header > h1 {
     filter: drop-shadow(3px 3px 8px #355) blur(0.5px);
 }
@@ -38,8 +37,7 @@ footer {
     border-top: 1px solid #a88;
 }
 
-footer .links,
-footer .tildeclub {
+footer .links {
     text-align: center;
 }
 

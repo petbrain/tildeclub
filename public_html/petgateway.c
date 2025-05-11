@@ -125,6 +125,77 @@ PwResult log_visitor(PwValuePtr args, PwValuePtr env)
 }
 
 /****************************************************************
+ * Get content: return HTML for endpoint
+ */
+
+PwResult get_content(PwValuePtr args, PwValuePtr env)
+{
+    PwValue result = log_visitor(args, env);
+    pw_destroy(&result);
+
+    result = PwMap(
+        PwCharPtr("status"),  PwUnsigned(200),
+        PwCharPtr("headers"), PwMap(PwCharPtr("Content-Type"), PwCharPtr("application/json")),
+        PwCharPtr("content"), PwMap(PwCharPtr("status"), PwCharPtr("ok"))
+    );
+    pw_return_if_error(&result);
+
+    PwValue content_filename = PwNull();
+    PwValue referrer = pw_map_get(env, "HTTP_REFERER");
+    if (pw_error(&referrer)) {
+        content_filename = pw_create_string("404");
+        pw_return_if_error(&content_filename);
+    } else {
+        // XXX strip base path instead of getting flat basename
+        content_filename = pw_basename(&referrer);
+        pw_return_if_error(&content_filename);
+        if (pw_strlen(&content_filename) == 0) {
+            pw_destroy(&content_filename);
+            content_filename = pw_create_string("000");
+            pw_return_if_error(&content_filename);
+        }
+    }
+    pw_expect_true( pw_string_append(&content_filename, ".myaw") );
+    PwValue content_dir = pw_create_string("/home/petbrain/content");
+    pw_return_if_error(&content_dir);
+
+    PwValue full_path = pw_path(&content_dir, &content_filename);
+    pw_return_if_error(&full_path);
+
+    PwValue title = PwNull();
+    PwValue html = PwNull();
+
+    PwValue file = pw_file_open(&full_path, O_RDONLY, 0);
+    if (pw_error(&file)) {
+        goto snafu;
+    } else {
+        PwValue page = mw_parse(&file);
+        if (pw_error(&page)) {
+            goto snafu;
+        }
+        title = pw_get(&page, "title");
+        if (pw_error(&title)) {
+            title = PwString();
+        }
+        html = pw_get(&page, "article", "html");
+        if (pw_error(&html)) {
+            goto snafu;
+        }
+    }
+    goto done;
+
+snafu:
+    pw_destroy(&html);
+    html = pw_create_string("<h1>Oops</h1><p>SNAFU</p>");
+
+done:
+    pw_expect_ok( pw_set(&html, &result, "content", "html") );
+    pw_expect_ok( pw_set(&title, &result, "content", "title") );
+
+    return pw_move(&result);
+}
+
+/****************************************************************
  * Get access log
  */
 
@@ -236,18 +307,22 @@ PwResult get_access_log(PwValuePtr args, PwValuePtr env)
 // methods of pwgateway
 Method methods[] = {
     { "log-visitor",    log_visitor },
+    { "get-content",    get_content },
     { "get-access-log", get_access_log }
 };
 
-PwResult pw_main(PwValuePtr env)
+PwResult pw_main()
 /*
  * PetWay pw_main returns PwResult which is checked
  * by the caller, main() function.
  */
 {
+    PwValue env = pw_read_environment();
+    pw_return_if_error(&env);
+
     // validate Content-Type
 
-    PwValue content_type = pw_map_get(env, "CONTENT_TYPE");
+    PwValue content_type = pw_map_get(&env, "CONTENT_TYPE");
     pw_return_if_error(&content_type, "Missing Content-Type");
     if (!pw_equal(&content_type, "application/json")) {
         return pw_status(PW_ERROR, "Bad content type of request");
@@ -255,7 +330,7 @@ PwResult pw_main(PwValuePtr env)
 
     // get Content-Length
 
-    PwValue content_length_str = pw_map_get(env, "CONTENT_LENGTH");
+    PwValue content_length_str = pw_map_get(&env, "CONTENT_LENGTH");
     pw_return_if_error(&content_length_str, "Missing Content-Length");
 
     PwValue clen = pw_parse_number(&content_length_str);
@@ -319,7 +394,7 @@ PwResult pw_main(PwValuePtr env)
     PwValue result = PwNull();
     for (unsigned i = 0; i < PW_LENGTH(methods); i++) {
         if (pw_equal(&method, methods[i].name)) {
-            result = methods[i].func(&args, env);
+            result = methods[i].func(&args, &env);
             break;
         }
     }
@@ -358,28 +433,28 @@ PwResult pw_main(PwValuePtr env)
     }
     pw_write_exact(&output, status_buf, n);
 
+    // no error handling since we started writing output
+    // well, we could write something to stderr, but why?
+
     for (unsigned i = 0, n = pw_map_length(&headers); i < n; i++) {{
         PwValue key = PwNull();
         PwValue value = PwNull();
         if (pw_map_item(&headers, i, &key, &value)) {
             {
                 PW_CSTRING_LOCAL(k, &key);
-                pw_expect_ok( pw_write_exact(&output, k, sizeof(k) - 1) );
+                pw_write_exact(&output, k, sizeof(k) - 1);
             }
             pw_expect_ok( pw_write_exact(&output, ": ", 2) );
             {
                 PW_CSTRING_LOCAL(v, &value);
-                pw_expect_ok( pw_write_exact(&output, v, sizeof(v) - 1) );
+                pw_write_exact(&output, v, sizeof(v) - 1);
             }
-            pw_expect_ok( pw_write_exact(&output, "\n", 1) );
+            pw_write_exact(&output, "\n", 1);
         }
     }}
-    pw_expect_ok( pw_write_exact(&output, "\n", 1) );
-    if (pw_ok(&content)) {
-        return pw_to_json_file(&content, 0, &output);
-    } else {
-        return pw_file_flush(&output);
-    }
+    pw_write_exact(&output, "\n", 1);
+    pw_to_json_file(&content, 0, &output);
+    return PwOK();
 }
 
 void critical_error(PwValuePtr status)
@@ -429,17 +504,9 @@ int main(int argc, char* argv[])
  */
 {
     init_allocator(&pet_allocator);
-
-    PwValue env = pw_read_environment();
-    if (pw_error(&env)) {
-        critical_error(&env);
-        return 0;
-    }
-
-    PwValue status = pw_main(&env);
+    PwValue status = pw_main();
     if (pw_error(&status)) {
         critical_error(&status);
-        return 0;
     }
     return 0;
 }

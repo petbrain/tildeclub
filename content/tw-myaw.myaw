@@ -1,144 +1,91 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="shortcut icon" type="image/png" href="https://tilde.club/favicon.png">
-    <link rel="preload" href="layout.v1.css" as="style">
-    <link rel="preload" href="theme.v1.css" as="style">
-    <link rel="stylesheet" href="layout.v1.css">
-    <link rel="stylesheet" href="theme.v1.css">
-    <script src="petgateway.js"></script>
-    <title>tw.myaw ~ petbrain ~ tilde.club</title>
-</head>
-<body>
-    <header>
-        <div class="badge">
-            <!-- Tilde Club Badge -->
-            <a href="http://tilde.club"><img src="http://tilde.club/~zarate/tildeclub.gif" border="0" width="88" height="31" alt="Tilde Club Badge"></a>
-        </div>
-        <h1><a href="/~petbrain">petbrain</a></h1>
-        <nav>
+title:
+    tw.myaw ~ petbrain ~ tilde.club
+
+article:
+    html:
+        <h1>tw.myaw</h1>
+        <p>
+            I discovered <a href="https://twtxt.dev/">twtxt</a> occasionally, when glanced
+            at <a href="http://tilde.club">tilde.club</a> server stats.
+            I found the idea behind twtxt useful to talk to myself, it just needed some extension.
+        </p>
+        <p>
+            In the first place I use MYAW instead of plain text.
+            MYAW looks the best format for raw source data I needed for years.
+        </p>
+        <p>
+            There's no well-known <strong>tw.myaw</strong> file like <a href="https://twtxt.dev/">twtxt</a>.
+            <strong>tw.myaw</strong> has concept of channels.
+            A well-known file is named <strong>twchan.myaw</strong>
+            and its root object is a map with the following structure:
+        </p>
+        <pre>
+        &lt;channel name&gt;:
+            filename:  # relative name of channel file, may include directory
+            archive:   # relative path to a directory with YYYY-MM archives
+        </pre>
+        <p>
+            All the gibberish is stored in channel files.
+            The root object is a mapping:
+        </p>
+        <pre>
+        channel:
+            file_id:   # unique identifier of channel file
+            about:     # channel description
+            avatar:    # channel avatar
+
+        items:
+            # list of items
+
+            - id:      # unique item identifier (optional)
+            parent:  # parent item identifier for replies
+            ts::isodate:  # timestamp
+            source:  # URL of the source if this item is fetched from somewhere
+            text:    # the message
+            data:    # source data in any other format
+                type:     # JSON, Markdown, etc.
+                content:  # the data
+            tags:    # list of tags
+            media:   # links to media, as in fedi, TBD
+        </pre>
+        <p>
+            New items are always appended to the end of file and the requester
+            may download only last changes.
+            However, the entire file can be re-created when it goes to archive.
+            That's why it contains file_id in the very beginning and the requester
+            must check it against local copy.
+            If file_id does not match, the requester moves local copy to the archive
+            and downloads new file.
+        </p>
+        <p>
+            The data can be archived when the size goes beyond some limit
+            or channel preferences get changed.
+            Thus, there's no need to include channel info into in each post
+            like fedi does for users.
+        </p>
+        <p>
+            Archive files are kept in subdirectories named YYYY-MM.
+            File name has the following format:
+        </p>
+        <pre>
+        CHANNEL-YYYYMMDD[HHMM]-YYYYMMDD[HHMM].myaw
+        </pre>
+        <p>
+            The first date is the date/time of first record (UTC),
+            and the second date is the date/time of last record.
+            HHMM part is optional, it is used when there are multiple
+            large files for the same day.
+        </p>
+        <p>
+            Files in the archive can be compressed.
+            Lzma is the preferred method.
+        </p>
+        <p>
+            Intended use and TODO:
             <ul>
-                <li><a href="dump.html">dump</a></li>
+                <li>twtxt derived from tw.myaw</li>
+                <li>collect fedi timelines into tw.myaw, group and display by tags, find frequent/rare words/ngrams</li>
+                <li>collect twtxt.xt from other sources</li>
+                <li>an interface to post to tw.myaw and to fedi</li>
             </ul>
-        </nav>
-    </header>
-    <main>
-        <article>
-            <p>
-                I discovered <a href="https://twtxt.dev/">twtxt</a> occasionally, when glanced
-                at <a href="http://tilde.club">tilde.club</a> server stats.
-                I found the idea behind twtxt useful to talk to myself, it just needed some extension.
-            </p>
-            <p>
-                In the first place I use MYAW instead of plain text.
-                MYAW looks the best format for raw source data I needed for years.
-            </p>
-            <p>
-                There's no well-known <strong>tw.myaw</strong> file like <a href="https://twtxt.dev/">twtxt</a>.
-                <strong>tw.myaw</strong> has concept of channels.
-                A well-known file is named <strong>twchan.myaw</strong>
-                and its root object is a map with the following structure:
-            </p>
-            <pre>
-&lt;channel name&gt;:
-    filename:  # relative name of channel file, may include directory
-    archive:   # relative path to a directory with YYYY-MM archives
-            </pre>
-            <p>
-                All the gibberish is stored in channel files.
-                The root object is a mapping:
-            </p>
-            <pre>
-channel:
-    file_id:   # unique identifier of channel file
-    about:     # channel description
-    avatar:    # channel avatar
-
-items:
-    # list of items
-
-    - id:      # unique item identifier (optional)
-      parent:  # parent item identifier for replies
-      ts::isodate:  # timestamp
-      source:  # URL of the source if this item is fetched from somewhere
-      text:    # the message
-      data:    # source data in any other format
-          type:     # JSON, Markdown, etc.
-          content:  # the data
-      tags:    # list of tags
-      media:   # links to media, as in fedi, TBD
-            </pre>
-            <p>
-                New items are always appended to the end of file and the requester
-                may download only last changes.
-                However, the entire file can be re-created when it goes to archive.
-                That's why it contains file_id in the very beginning and the requester
-                must check it against local copy.
-                If file_id does not match, the requester moves local copy to the archive
-                and downloads new file.
-            </p>
-            <p>
-                The data can be archived when the size goes beyond some limit
-                or channel preferences get changed.
-                Thus, there's no need to include channel info into in each post
-                like fedi does for users.
-            </p>
-            <p>
-                Archive files are kept in subdirectories named YYYY-MM.
-                File name has the following format:
-            </p>
-            <pre>
-CHANNEL-YYYYMMDD[HHMM]-YYYYMMDD[HHMM].myaw
-            </pre>
-            <p>
-                The first date is the date/time of first record (UTC),
-                and the second date is the date/time of last record.
-                HHMM part is optional, it is used when there are multiple
-                large files for the same day.
-            </p>
-            <p>
-                Files in the archive can be compressed.
-                Lzma is the preferred method.
-            </p>
-            <p>
-                Intended use and TODO:
-                <ul>
-                    <li>twtxt derived from tw.myaw</li>
-                    <li>collect fedi timelines into tw.myaw, group and display by tags, find frequent/rare words/ngrams</li>
-                    <li>collect twtxt.xt from other sources</li>
-                    <li>an interface to post to tw.myaw and to fedi</li>
-                </ul>
-            </p>
-        </article>
-    </main>
-    <footer>
-        <div class="links">
-            ~
-            <a rel="me" href="https://fosstodon.org/@petbrain">Mastodon</a>
-            ~
-            <a href="https://github.com/petbrain">Github</a>
-            ~
-        </div>
-        <div class="tildeclub">
-            <!-- Tilde.Club Ring -->
-            <img src="http://tilde.club/~harper/webring.png" usemap="#notepad.map">
-            <br>
-            Click for the [
-            <a href="http://tilde.club/~harper/link.html?action=random" target="_top">Random page</a> ]
-            <br>
-            Want to join the ring? Click here for
-            <a href="http://tilde.club/~harper/link.html?action=info" target="_top">info</a>.
-            <br>
-            <map name="notepad.map">
-                <area shape="rect" coords="0, 0, 60, 70" target="_top" href="http://tilde.club/~harper/link.html?action=join">
-                <area shape="rect" coords="130, 0, 417, 75" target="_top" href="http://tilde.club/~harper/link.html?action=random">
-                <area shape="rect" coords="465, 0, 549, 75" target="_top" href="http://tilde.club/~harper/link.html?action=join">
-            </map>
-            <!-- Tildeverse Banner Exchange -->
-            <iframe src="https://banner.tildeverse.org/work.php?ID=deepend" width="468" height="60" marginwidth="0" marginheight="0" hspace="0" vspace="0" frameborder="0" scrolling="no" target="_blank"></iframe>
-        </div>
-    </footer>
-</body>
-</html>
+        </p>
