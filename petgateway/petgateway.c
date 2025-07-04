@@ -15,8 +15,7 @@
 
 #define MAX_REQUEST_LENGTH  (1024 * 1024 * 1024)  // 1M
 
-//#define CONTENT_DIR "/home/petbrain/content"
-#define CONTENT_DIR "/home/thoughtful-pet/projects/tildeclub/content"
+#define CONTENT_DIR "/home/petbrain/content"
 
 typedef struct {
     char* name;
@@ -38,8 +37,8 @@ typedef struct {
  * Log visitor
  */
 
-//char log_filename[] = "/home/petbrain/public_html/tw.myaw/test/visitors.myaw";
-char log_filename[] = "visitors.myaw";
+char log_filename[] = "/home/petbrain/public_html/tw.myaw/test/visitors.myaw";
+//char log_filename[] = "visitors.myaw";
 
 typedef struct {
     char* env_var_name;
