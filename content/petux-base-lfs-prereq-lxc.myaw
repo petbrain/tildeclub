@@ -1,0 +1,156 @@
+title:
+    Setting up LXC for playing with peTux LFS base system ~ petbrain ~ tilde.club
+
+article:
+    html::literal:
+        <h1>Setting up LXC for playing with peTux LFS base system</h1>
+
+        <p>
+            Containers are highly recommended for pets who don't want to be spanked
+            by shoes if she-master notices some changes on her system.
+        </p>
+        <p>
+            The following was done on some linuxmint, but should be applicable to any Debian-based distro.
+        </p>
+
+        <h2>On the host system</h2>
+
+        <h3>Install LXC</h3>
+
+        <pre>
+        apt install --no-install-recommends lxc lxc-templates libvirt0 libpam-cgfs \
+            debootstrap distro-info debian-keyring debian-archive-keyring
+        </pre
+        <p>
+            Pet didn't want lxc-net on its way:
+        </p>
+        <pre>
+        systemctl stop lxc-net
+        systemctl disable lxc-net
+        </pre>
+
+        <h3>Setup networking</h3>
+
+        <p>
+            To keep changes on the hosts system at the minimum, LXC network configuration
+            will be in router mode.
+            Enabled NAT for that:
+        </p>
+        <pre>
+        table ip nat {
+            chain postrouting {
+                type nat hook postrouting priority 100; policy accept;
+                oif eth0 masquerade random,persistent
+            }
+        }
+        </pre>
+        <p>
+            and made sure routing is enabled in /etc/sysctl.conf:
+        </p>
+        <pre>
+        net.ipv4.ip_forward=1
+        </pre>
+
+        <h3>Create container</h3>
+
+        <p>
+            Now okay to create unprivileged container:
+        </p>
+        <pre>
+        lxc-create -n petux-dev -t debian -- -r bookworm
+        </pre>
+        <p>
+            Configuration for the container:
+        </p>
+        <pre>
+        lxc.hook.version = 1
+
+        lxc.net.0.type = veth
+        lxc.net.0.veth.mode = router
+        lxc.net.0.ipv4.address = 192.168.10.2/24
+        lxc.net.0.ipv4.gateway = 192.168.10.1
+        lxc.net.0.flags = up
+        lxc.net.0.script.up = /bin/sh -c "ip address add 192.168.10.1 dev $LXC_NET_PEER"
+
+        lxc.apparmor.profile = unconfined
+        lxc.apparmor.allow_nesting = 1
+        lxc.rootfs.path = dir:/var/lib/lxc/petux-dev/rootfs
+
+        # Common configuration
+        lxc.include = /usr/share/lxc/config/debian.common.conf
+
+        # Container specific configuration
+        lxc.tty.max = 4
+        lxc.uts.name = petux-dev
+        lxc.arch = amd64
+        lxc.pty.max = 1024
+        </pre>
+        <p>
+            The host system does not use IPv6, so neither does the container.
+            Pet added the following lines to <span class="command">/var/lib/lxc/petux-dev/rootfs/etc/sysctl.conf</span>:
+        </p>
+        <pre>
+        net.ipv6.conf.all.disable_ipv6 = 1
+        net.ipv6.conf.default.disable_ipv6 = 1
+        </pre>
+        <p>
+            Finally, made it comfortable:
+        </p>
+        <pre>
+        cp .bashrc /var/lib/lxc/petux-dev/rootfs/root/
+        </pre>
+
+        <h2>In the container</h2>
+
+        <p>
+            Now okay to go to the container:
+        </p>
+        <pre>
+        lxc-start petux-dev
+        lxc-attach petux-dev
+        </pre>
+
+        <h3>Install essentials</h3>
+
+        <pre>
+        apt install less nano curl wget
+        </pre>
+        <p>
+            Packages for compiling linux kernel as mentioned on this page
+            <a href="https://wiki.debian.org/BuildADebianKernelPackage">https://wiki.debian.org/BuildADebianKernelPackage</a>
+            except kernel sources.
+        </p>
+        <p>
+            These packages should be sufficient for compiling the base system as well.
+        </p>
+        <pre>
+        apt install build-essential bc kmod cpio flex libncurses5-dev libelf-dev libssl-dev dwarves bison
+        </pre>
+
+        <h3>Install LFS requirements</h3>
+
+        <pre>
+        apt install gawk python3 texinfo
+        rm /bin/sh
+        ln -s /bin/bash /bin/sh
+        </pre>
+
+        <h3>Miscellaneous</h3>
+
+        <p>
+            Pet wanted to play with crosstool-ng too:
+        </p>
+        <pre>
+        apt install unzip help2man file libtool libtool-bin
+        </pre>
+
+        <h3>Create unprivileged user</h3>
+
+        <pre>
+        adduser --ingroup users --shell /bin/bash user
+        </pre>
+
+        <p>
+            That's all.
+            Now it's time to <span class="command">su -l user</span> and have fun.
+        </p>

@@ -1,0 +1,78 @@
+title:
+    peTux ~ petbrain ~ tilde.club
+
+article:
+    html::literal:
+        <h1>peTux</h1>
+
+        <h2>Design principles</h2>
+
+        <p>
+            Here's what pet wants:
+        </p>
+
+        <ul>
+            <li>Container-based system</li>
+            <li>Easy user data migration across container of various architectures</li>
+            <li>User data isolation: programs that work with user data are prohibited to access network</li>
+            <li>Hardware isolation: keep critical parts on dedicated computers to prevent key leaks</li>
+            <li>Software isolation, like in NixOS but differently</li>
+            <li>Digital sovereignity</li>
+            <li>Plausible deniability</li>
+            <li>Blending with humans</li>
+        </ul>
+
+        <p>
+            Some of these points are quite difficult.
+            The most important is <i>blending with humans</i>
+            which means the distro should have no references to the origin.
+            Neither it should have <i>peTux</i> in any file.
+            If you're a pet managed to read this, be extremely careful.
+            One silly mistake and humans easily guess you're a pet.
+        </p>
+
+        <p>
+            Plausible deniability is the next point of importance.
+            If humans notice something unusual, pet should have an alternative version, easy to swallow.
+            Existing projects are the rescue. Pet can paw at them and say that's feature is from there
+            and there, and that's the default one.
+        </p>
+
+        <p>
+            Digital sovereignity means the ability to rebuild pet's system totally offline.
+            Also, it opens unlimited possibilities to incorporate necessary stuff in standard utilities.
+            Evil humans will have to investigate much much deeper to prove it is pet who pissed in their shoes.
+            99.999% they won't because it's easier to fake reports with catnip than to do something
+            clever at their dull jobs they have to attend every day.
+        </p>
+
+        <p>
+            Omitting middle points, the main peTux feature is containers in the first place.
+            Pet loves containers.
+            They help to avoid distro hopping and they make plausible deniability easy to implement.
+            LXC looks the best choice.
+            Although it might be less secure than KVM, it works on every SBC and retro hardware
+            at minimal overhead.
+        </p>
+
+
+        <h2>The base system</h2>
+
+        <p>
+            peTux is not about precompiled binaries (can you trust an anonymous pet?), nor about exact instructions.
+            It's about ideas and artifacts pet managed to collect from humans.
+            Basically, everyone is free to choose any distro for the base system.
+            Pet walks its own way following the most attractive scent of freedom.
+            And the most amazing artifact on this way is <a href="https://www.linuxfromscratch.org">LFS</a>.
+            It's like a catnip that makes pet high.
+        </p>
+
+        <ul>
+            <li><a href="petux-base-lfs">peTux base system based on LFS</a></li>
+        </ul>
+
+        <h2>Sources</h2>
+
+        <p>
+            <a href="https://github.com/petbrain/petux">github repo</a> (empty for now)
+        </p>

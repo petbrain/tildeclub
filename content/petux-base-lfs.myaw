@@ -1,0 +1,402 @@
+title:
+    peTux LFS base system ~ petbrain ~ tilde.club
+
+article:
+    html::literal:
+        <h1>peTux LFS base system</h1>
+
+        <p>
+            All the notes below are applicable to Linux From Scratch Version r12.3-68 Published June 5th, 2025.
+        </p>
+
+        <h2>Prerequisites</h2>
+
+        <p>
+            Host system: some she-master's linuxmint.
+            Pet did not want to install any development packages on the host system,
+            so it <a href="petux-base-lfs-prereq-lxc">installed LXC</a>.
+        </p>
+
+        <h2>Give LFS a try</h2>
+
+        <p>
+            It's not feasible to experiment with LFS without some automation.
+            ALFS does not look an option to pet.
+            Instead, it uses its own <a href="https://github.com/petbrain/petux">simple shell scripts</a>.
+        </p>
+        <p>
+            Scripts for each packages are located in <span class="command">packages/{name}</span> subdirectory.
+            Normally they are invoked by top level driver scripts, but also can be run manually.
+            Without arguments they build and install a package, but with an argument
+            they take specific action, either <span class="command">build</span> or <span class="command">install</span>.
+            It's important to set environment variables before running scripts manually.
+            For example, binutils pass 1 build only would require the following commands:
+        </p>
+        <pre>
+        . ./environment-lfs
+        cd packages/binutils
+        ./build-lfs-pass1 build
+        </pre>
+        <p>
+            <span class="command">-e</span> option for <span class="command">sh</span> in shebang makes script to fail if any command fails.
+            Setting <span class="command">pipefail</span> is important as well.
+            To understand why, try the following:
+        </p>
+        <pre>
+        false
+        echo $?
+
+        false | tee /dev/null
+        echo $?
+        </pre>
+        <p>
+            Package scripts save <span class="command">config.log</span> file
+            and the top-level driver script saves output of all scripts it runs.
+            Logs along with <span class="command">diff</span> utility help a lot to find source of problems
+            while playing with <span class="command">configure</span> options.
+        </p>
+        <p>
+            Also, pet's scripts use <span class="command">install-strip</span> instead of
+            bare <span class="command">install</span> wherever possible.
+        </p>
+
+        <h3>Let fun begin</h3>
+
+        <p>
+            When playing with options it does not make sense to build entire toolchain with all those m4, make, grep, etc.
+            Here's the minimal set of packages to focus on:
+        </p>
+        <ul>
+            <li>Binutils pass 1</li>
+            <li>GCC pass 1</li>
+            <li>Linux API headers</li>
+            <li>Glibc</li>
+            <li>Libstdc++ from GCC</li>
+            <li>Binutils pass 2</li>
+            <li>GCC pass 2</li>
+        </ul>
+        <p>
+            They build GCC with mpc, mpfr, and gmp unpacked in the GCC source tree.
+            Pre-installing or building these libraries separately could save compile time when playing with GCC options,
+            but pet lacks experience to do that in the first place.
+        </p>
+
+        <h3>Checkpoint 1</h3>
+
+        <p>
+            After GCC pass 1 it's worth to try running it:
+        </p>
+        <pre>
+        echo | $LFS/tools/bin/$LFS_TGT-gcc -v -x c -
+        </pre>
+        <p>
+            Take a look at include search paths below this line
+        </p>
+        <pre>
+        #include &lt;...&gt; search starts here
+        </pre>
+        <p>
+            and at <i>ignoring nonexistent directory</i> above it.
+            Some of those nonexistent directories will exist after installing Glibc.
+        </p>
+        <p>
+            Same for C++ compiler:
+        </p>
+        <pre>
+        echo | $LFS/tools/bin/$LFS_TGT-gcc -v -x c++ -
+        </pre>
+        <p>
+            The output explains the format of include path they provide to libstdc++ using --with-gxx-include-dir option
+            and it's helpful if you want to play with locations of include directories.
+        </p>
+
+        <h3>Checkpoint 2</h3>
+
+        <p>
+            When Glibc is in place we can make sure C compiler is working by trying
+        </p>
+        <pre>
+        echo -e '#include &lt;stdio.h&gt;\nint main(){puts("hello");return 1;}' | $LFS/tools/bin/$LFS_TGT-gcc -x c - -v
+        </pre>
+        <p>
+            Produced <span class="command">a.out</span> is intended to run in chrooted environment.
+            On the host system it may end up with segfault.
+        </p>
+
+        <h3>Checkpoint 3</h3>
+
+        <p>
+            When libstdc++ is in place we can make sure C++ compiler is working by trying
+        </p>
+        <pre>
+        echo -e '#include &lt;iostream&gt;\nint main(){std::cout&lt;&lt;"hello\\n";return 1;}' | $LFS/tools/bin/$LFS_TGT-g++ -x c++ - -v
+        </pre>
+        <p>
+            Mind <span class="command">g++</span>. Although C++ is specified by <span class="command">-x</span>,
+            the linker will fail if <span class="command">$LFS_TGT-gcc</span> is used instead of <span class="command">$LFS_TGT-g++</span>.
+        </p>
+        <p>
+            Same as at checkpoint 2, produced <span class="command">a.out</span> is intended to run in chrooted environment.
+            On the host system it most likely will end up with segfault.
+        </p>
+
+        <h2>In details</h2>
+
+        <p>
+            GCC's <a href="https://gcc.gnu.org/onlinedocs/gccint/Configure-Terms.html">Configure Terms and History</a>
+            defines term <i>cross</i>. Yes, just <i>cross</i>.
+            It's when <span class="command">--build</span> equals to <span class="command">--host</span>
+            but <span class="command">--target</span> is different.
+        </p>
+        <p>
+            This means that a tool built with <span class="command">--target</span> option
+            will generate code and build executables for that target.
+            For GCC this means <em>building cross compiler</em>,
+            for binutils, this is <em>building a cross linker</em> as LFS book says in binutils pass 1 section.
+            However, <strong>cross compilation does not take place here</strong>.
+            Cross-compiler would be involved only when
+            <span class="command">--build</span> and <span class="command">--host</span> are different.
+            This can be checked in <span class="command">config.log</span>.
+            Most of pet's mistakes were caused by wrong triplets passed to these options.
+        </p>
+        <p>
+            Note that <span class="command">--target</span> does not make sense for anything that does not generate code,
+            i.e. Glibc, libstdc++, make, grep, m4, etc.
+        </p>
+        <p>
+            Triplet for <span class="command">--build</span> is usually guessed
+            by <span class="command">config.guess</span> script.
+            On Debian system some confusion might take place because
+            <span class="command">config.guess</span> returns full triplet like
+            <i>x86_64-pc-linux-gnu</i>, but <span class="command">gcc -v</span>
+            says it was configured with <i>x86_64-linux-gnu</i>, i.e. without <i>-pc</i> particle.
+        </p>
+        <p>
+            This particle is <i>vendor</i> and some systems omit it.
+            This is best explained in <a href="https://wiki.osdev.org/Target_Triplet">https://wiki.osdev.org/Target_Triplet</a>.
+        </p>
+        <p>
+            Basically, it does not matter if <span class="command">--build</span> and <span class="command">--host</span>
+            aren't equal to what preinstalled compiler was configured with.
+            The key point is that they equal to each other.
+            Pet tried absolutely different vendor, e.g. <span class="command">--build == --host == x86_64-wtf-linux-gnu</span>.
+            Result is the same: it works and produces correct binutils assuming <span class="command">--target=x86_64-lfs-linux-gnu</span>.
+        </p>
+
+        <h3>Binutils pass 1</h3>
+
+        <p>
+            No cross-compilation here.
+            The only option is <span class="command">--target=$LFS_TGT</span>.
+        </p>
+        <p>
+            Options <span class="command">--build</span> and <span class="command">--host</span> are not specified
+            and default to value returned by <span class="command">config.guess</span>.
+        </p>
+        <p>
+            As long as no GCC executables with target prefix exist yet, host compiler will be used.
+        </p>
+        <p>
+            Installed executables must have target prefix.
+            If they haven't, something went wrong.
+        </p>
+
+        <h3>GCC pass 1</h3>
+
+        <p>
+            Same as in binutils pass 1, we do not cross-compile here yet, we build cross compiler.
+        </p>
+
+        <h3>Linux API headers</h3>
+
+        <p>
+            No compilation takes place here at all, we just copy.
+        </p>
+
+        <h3>Glibc</h3>
+
+        <p>
+            This is where cross-compilation begins.
+            LFS uses two options for this: <span class="command">--host=$LFS_TGT</span>
+            and <span class="command">--build=$(../scripts/config.guess)</span>.
+            <span class="command">--target</span> does not make sense for Glibc.
+        </p>
+        <p>
+            <span class="command">configure</span> script will find newly compiled GCC thanks to <span class="command">PATH</span>
+            variable that includes path to the <span class="command">tools</span> directory in the first place
+            and prefix that matches <span class="command">--host</span>.
+        </p>
+
+        <h3>Libstdc++ from GCC</h3>
+
+        <p>
+            Same as for Glibc, we cross-compile it.
+            Note that installation path matches directory where <span class="command">g++</span>
+            expects include files (see Checkpoint 1).
+            This is set by <span class="command">--with-gxx-include-dir=/tools/$LFS_TGT/include/c++/$PKGVERSION_GCC</span>.
+        </p>
+
+        <h3>Binutils pass 2</h3>
+
+        <p>
+            All the same, cross-compile it.
+            Pass 2 unbinds binutils from host libraries so they can run in chrooted environment.
+            Binutils are installed in <span class="command">/usr</span>.
+            What looks strange to pet is that they don't have target triplet prefix as in pass 1.
+            Adding <span class="command">--target=$LFS_TGT</span> as for GCC pass 2 has no effect.
+            Pet is unable to comprehend this.
+        </p>
+
+        <h3>GCC pass 2</h3>
+
+        <p>
+            This option is important for building internal executables:
+            <span class="command">--with-build-sysroot=$LFS</span>.
+            Replacing it with <span class="command">--with-sysroot</span> causes errors.
+        </p>
+        <p>
+            GCC installs executables with and without target prefix.
+        </p>
+
+        <h3>Checkpoint 4</h3>
+
+        <p>
+            After GCC pass 2 compilers can be checked in chrooted environment:
+        </p>
+        <pre>
+        cp -a $LFS $LFS-copy
+        chown -R root:root $LFS-copy
+        echo -e '#include &lt;stdio.h&gt;\nint main(){puts("hello");return 1;}' | chroot $LFS-copy /usr/bin/gcc -x c - -v
+        echo -e '#include &lt;iostream&gt;\nint main(){std::cout&lt;&lt;"hello\\n";return 1;}' | chroot $LFS-copy /usr/bin/g++ -x c++ - -v
+        </pre>
+
+        <h3>Notes</h3>
+
+        <p>
+            Cross-compiler in <span class="command">/tools</span> directory is still required to buils
+            missing utilities to run <span class="command">configure</span> scripts in chrooted environment.
+            They are listed in LFS book Chapter 6. "Cross Compiling Temporary Tools" and have build scripts
+            in <a href="https://github.com/petbrain/petux/base-system/lfs/packages">packages repository</a>.
+        </p>
+
+        <h2>LFS host/target tweaks</h2>
+
+        <p>
+            All those <span class="command">--build</span>, <span class="command">--host</span>,
+            and <span class="command">--target</span> are confusing.
+            Pet wants clarity so let's start from small tweaks bearing cross-compilation to different architecture in mind.
+        </p>
+        <p>
+            First, explicitly define HOST and TARGET environment variables.
+            We do not need BUILD, we assume BUILD is same as HOST because we're building both toolchain
+            and the final system on the same machine.
+            We won't run toolchain on different machine, so we need only two variables.
+        </p>
+        <p>
+            Strictly speaking we should define BUILD instead of HOST, but BUILD is an awkward name
+            in this context, whereas HOST sounds more naturally.
+        </p>
+        <p>
+            HOST can be read from preinstalled GCC output as
+        </p>
+        <pre>
+        HOST=$(gcc -v 2&gt;&amp;1 | grep -E "^Target: (.*?)"| cut -f2 -d' ')
+        </pre>
+        <p>
+            TARGET is where we want the system to run.
+            We should add something unique to the triplet to make cross things working.
+            Let it be <span class="command">petux</span>, we'll get rid of this later in the final system:
+        </p>
+        <pre>
+        TARGET=${DEST_ARCH}-petux-linux-gnu
+        </pre>
+        <p>
+            Let's leave DEST_ARCH same as <span class="command">uname -m</span> for now to avoid unnecessary problems.
+        </p>
+
+        <h3>Binutils pass 1</h3>
+
+        <p>
+            <span class="command">configure</span> options will be:
+        </p>
+        <pre>
+        --build=$HOST
+        --host=$HOST
+        --target=$TARGET
+        </pre>
+        <p>
+            It's not cross-compilation, so <span class="command">--build</span> and <span class="command">--host</span>
+            are the same and equal to the triplet of machine we're building on.
+        </p>
+        <p>
+            <span class="command">--target</span> defines final target which can be different architecture.
+            The resulting compiler will generate code for it but it will run on the machine defined
+            by <span class="command">--host</span>, i.e. this one we're building on.
+        </p>
+
+        <h3>Glibc and Libstdc++</h3>
+
+        <p>
+            We're cross-compiling Glibc to run on TARGET (i.e. chrooted environment in our exercise),
+            so <span class="command">configure</span> options are:
+        </p>
+        <pre>
+        --build=$HOST
+        --host=$TARGET
+        </pre>
+
+        <h3>Binutils pass 2</h3>
+
+        <p>
+            Same as libraries above, however pet is still unable to comprehend why <span class="command">--target</span>
+            option has no effect here.
+        </p>
+
+        <h3>GCC pass 2</h3>
+
+        <p>
+            We're cross-compiling GCC to run on TARGET and generate code for TARGET.
+            So, <span class="command">configure</span> options are:
+        </p>
+        <pre>
+        --build=$HOST
+        --host=$TARGET
+        --target=$TARGET
+        </pre>
+
+        <h3>Cross compiling other tools</h3>
+
+        <p>
+            Now it's time to run function <span class="command">build_utils</span> in the
+            <span class="command">build-lfs</span> script.
+            It will compile all the rest packages listed in LFS Chapter 6. "Cross Compiling Temporary Tools".
+        </p>
+
+        <h2>Organizing packages</h2>
+
+        <p>
+            Pet does not like piles of files scattered across root file system.
+            Clever humans invented NIX, others have to live with FHS.
+            Pet has to stick to FHS too but it fancies to easily know without a package manager
+            (LFS does not provide any) to which package any given file belongs to.
+        </p>
+        <p>
+            Symbolic links could be a solution.
+            Let's try this approach.
+        </p>
+
+Binutils and GCC pass 1
+
+Add DESTDIR to make install:
+
+make DESTDIR=$PX_ROOT/packages/$PACKAGE-pass1 install-strip
+
+Change
+--prefix=$PX_ROOT/tools
+to
+--prefix=$/tools
+
+otherwise subdirectory $PX_ROOT/packages will include absolute path
+
+limits.h concatenation command for GCC needs tweaks too.
+
