@@ -2,7 +2,7 @@ title:
     petbrain ~ tilde.club
 
 article:
-    html:
+    html::literal:
         <div style="font-size:3rem; font-weight:bold">Pets only</div>
         <div id="enter" class="enter">ENTER</div>
         <div id="enter-footnote" class="enter-footnote">their masters and friends<br/>are admitted too</div>

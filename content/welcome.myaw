@@ -2,28 +2,20 @@ title:
     petbrain ~ tilde.club
 
 article:
-    html:
+    html::literal:
         <h1>Pet projects</h1>
 
+        <h2>peTux</h2>
+
         <p>
-            In past life pet was strangled and swallowed by python.
-            All seemed to be over but brave pet rose up from feces.
-            In this new life pet vowed not to write any single line in python
-            so the most of projects are in plain C.
-        </p>
-        <p>
-            Pet chose C language for its simplicity and underestimated capabilities that
-            make programming easy, safe, and what's much more important, maintainable by a single pet.
-            Unlike modern languages, C does not make pet puking.
-            Honestly, the preprocessor does, but that's the least evil.
+            <a href="petux">peTux</a> is a linux distro pet is struggling to build.
         </p>
 
         <h2>MYAW</h2>
 
         <p>
             The most essential thing for almost every program is configuration.
-            That's why pet started its way to C from writing a parser.
-            YAML was the best choise due to readability.
+            From pet's perspective YAML looks the best choice for that but it smells like humans.
             Pet revised the specification, made parsing rules unambiguous,
             added conversion concept and more data types.
             This resulted in <a href="https://github.com/petbrain/myaw">MYAW</a>, pet's version of YAML.
@@ -40,8 +32,15 @@ article:
             for application programming in C.
         </p>
         <p>
-            Source code: <a href="https://github.com/petbrain/petway">PetWay</a> (sorry, GH haters).
+            Source code: <a href="https://github.com/petbrain/petway">PetWay</a>.
         </p>
+
+        <h3>Milestones</h3>
+
+        <ul>
+            <li><span class="date">July 2, 2025</span> <a href="petway-milestone-20250702">A step towards PetLang:
+                revised calling conventions.</a></li>
+        </ul>
 
         <h2>libpussy</h2>
 
@@ -67,10 +66,9 @@ article:
             <li><a href="tildeclub-cgi-app-with-local-storage">tilde.club CGI application with local storage</a></li>
         </ul>
 
-        <h1>Ideas</h1>
+        <h1>Social</h1>
 
-        <ul>
-            <li><a href="tw-myaw">tw.myaw</a>: inspired by <a href="https://twtxt.dev/">twtxt</a>,
-                an extended thing. Currently at planning stage.</li>
-            <li><a href="https://github.com/petbrain/petux">petux</a>: just announcing upcoming project</li>
-        </ul>
+        <p>
+            Pet is an antisocial creature, but tilde.zone kindly gave it
+            an <a rel="me" href="https://tilde.zone/@petbrain">account</a>
+        </p>

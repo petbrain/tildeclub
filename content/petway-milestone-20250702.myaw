@@ -1,0 +1,97 @@
+title:
+    PetWay milestone ~ petbrain ~ tilde.club
+
+article:
+    html::literal:
+        <h1>A step towards PetLang: revised calling conventions.</h1>
+
+        <div class="date">July 2, 2025</div>
+
+        <p>
+            Initially PetWay was designed to facilitate programming in C,
+            but the ultimate goal is to make it a runtime for PetLang.
+            This milestone is a step towards calling conventions
+            required for threaded code.
+        </p>
+
+        <h2>Changes</h2>
+
+        <ul>
+            <li>Dropped PwResult in favor of "bool" return value and optional "result" argument.
+                <ul>
+                    <li>Result is a pointer to any type for now.
+                        For example, for "tell" and "seek" functions the result type is "off_t*".</li>
+                    <li>Ultimately "result" will be a pointer to function-specific result structure.</li>
+                    <li>Result is the last argument except for functions that accept variadic arguments.</li>
+                    <li>Result is NOT guaranteed to be Null upon function call.
+                        Function must call "pw_destroy" before assigning it.</li>
+                </ul>
+            </li>
+            <li>Added Task structure. Currently it has only one field "status".
+                This field is updated when a function returns "false".
+                When a function returns "true", status should be set to PW_SUCCESS, but for now it is unchanged.</li>
+            <li>Status type is no longer special for maps and arrays.
+                But is is still special for variadic functions.</li>
+            <li>Variadic arguments of PwValue type are always passed by value.
+                They can't be passed by pointer anymore.</li>
+            <li>CharPtr's clone no longer converts to string.</li>
+        </ul>
+
+        <h2>Interfacing with C</h2>
+
+        <p>
+            Some functions still return PwValue: pw_clone and variadic functions.
+        </p>
+        <p>
+            Variadic functions are extremely convenient for expressing maps and arrays in C,
+            but functions no longer return PwResult.
+            As a workaround, "pwva" macro was added.
+            It exploits GNU extension "statement expression" and returns either result or status,
+            depending on function's return value.
+            If an error occurs when some variadic argument is pushed on stack,
+            it is impossible to handle such an error during function call.
+            These errors are handled by variadic function that checks arguments.
+            Arguments are always passed by value and variadic function is responsible for destroying them
+            upon return.
+        </p>
+        <p>
+            pw_get and pw_map_get are confusing because the result is the first argument for the former
+            and is the last argument for the latter.
+        </p>
+
+        <h2>What helps to avoid common mistakes</h2>
+
+        <ul>
+            <li>[[nodiscard]] attribute for functions, this ensures the boolean return value is always checked.</li>
+            <li>Calling pw_destroy for the destination in "pw_move" and "pw_clone2".</li>
+            <li>Cleanup attribute for PwValue.</li>
+        <ul>
+
+        <h2>What caused segfaults</h2>
+
+        <ul>
+            <li>Uninitialized PwValue variable that receives result.
+                In PetLang all variables will be initialized unless specifically declared as uninitialized (TBD)</li>
+        <ul>
+
+        <h2>Future work</h2>
+
+        <p>
+            Finish Pet Preprocessor's initial task: facilitate definition of per-function arguments and result structures.
+        </p>
+        <p>
+            Rewrite parts of PetWay in PetLang.
+            Freeze current codebase for bootstrapping.
+        </p>
+            Revise CharPtr. Merge with String? I.e. use str_static along with str_embedded? Think through UTF-8 type.
+        </p>
+        </p>
+            Think through objectives concept as an alternative to tracebacks.
+        </p>
+        </p>
+            Think through variadic arguments and results concept in PetLang.
+        </p>
+        <p>
+            Think through concept of multiple exit points.
+            That's like promises that have two callbacks: resolve and reject.
+        </p>

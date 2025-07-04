@@ -1,57 +1,32 @@
 html {
-    color: #422;
-    background: lightgrey;
+    font-family: sans-serif;
+    color: #311;
+    background: #f4f4f4;
 }
 
-header {
-    background: #eee;
-    border-bottom: 1px solid #a88;
-}
-
-header > h1 {
-    filter: drop-shadow(3px 3px 8px #355) blur(0.5px);
-}
-
-header > nav > ul {
+body {
     margin: 0;
-    padding: 0;
-}
-
-header > nav > ul > li {
-    display: inline-block;
-    font-weight: bolder;
-    line-height: 2rem;
-    margin-left: 1rem;
-}
-header > nav > ul > li::before {
-    content: "~";
-    margin-right: 0.5rem;
 }
 
 main {
-    background: #f8f8f8;
+    padding: 0 0.5rem;
 }
 
-footer {
-    background: #eee;
-    border-top: 1px solid #a88;
+article {
+    max-width: 56rem;
 }
 
-footer .links {
-    text-align: center;
+h1 {
+    font-size: 2rem;
 }
-
-footer .links {
-    margin-bottom: 1rem;
+h2 {
+    font-size: 1.5rem;
 }
-
-header a,
-header a:hover,
-header a:visited,
-footer a,
-footer a:visited {
-    color: #422;
-    text-decoration: none;
+h3 {
+    font-size: 1.25rem;
+}
+h4, h5, h6, h7 {
+    font-size: 1rem;
 }
 
 a {
@@ -71,15 +46,22 @@ a:focus-visible {
     outline-offset: 0.125rem;
 }
 
+.nobreak {
+    white-space: nowrap;
+}
+
 .command {
     font-family: monospace;
     font-size: 125%;
-    color: #977;
+    color: #755;
 }
 
 pre {
+    width: 100%;
     overflow-x: auto;
     font-size: 125%;
+    background-color: #fafafa;
+    padding: 0.5rem;
 }
 
 article .date {
