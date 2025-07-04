@@ -65,14 +65,14 @@ article:
             <li>[[nodiscard]] attribute for functions, this ensures the boolean return value is always checked.</li>
             <li>Calling pw_destroy for the destination in "pw_move" and "pw_clone2".</li>
             <li>Cleanup attribute for PwValue.</li>
-        <ul>
+        </ul>
 
         <h2>What caused segfaults</h2>
 
         <ul>
             <li>Uninitialized PwValue variable that receives result.
                 In PetLang all variables will be initialized unless specifically declared as uninitialized (TBD)</li>
-        <ul>
+        </ul>
 
         <h2>Future work</h2>
 
