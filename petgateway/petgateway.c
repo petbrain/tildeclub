@@ -196,7 +196,18 @@ CgiNameMap cgi_params_map[] = {
     PwValue file = PW_NULL;
 
     if (!pw_file_open(&full_path, O_RDONLY, 0, &file)) {
-        return false;
+        if (!pw_is_errno(ENOENT)) {
+            return false;
+        }
+        if (!pw_create_string("404.myaw", &content_filename)) {
+            return false;
+        }
+        if (!pw_path(&full_path, pwva(_pw_create_string_ascii, CONTENT_DIR), pw_clone(&content_filename))) {
+            return false;
+        }
+        if (!pw_file_open(&full_path, O_RDONLY, 0, &file)) {
+            return false;
+        }
     }
     if (!mw_parse(&file, &page)) {
         return false;
