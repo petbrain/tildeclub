@@ -1,0 +1,43 @@
+title:
+    Website in error space ~ petbrain ~ tilde.club
+
+article:
+    html::literal:
+        <h1>Website in error space</h1>
+
+        <p>
+            The idea is based on the fact that HTTP error responses include content.
+        </p>
+        <p>
+            This content is solely for humans.
+        </p>
+        <p>
+            Bots are happy with status code and status string.
+            The vast majority of them ignore content if status code is not 200.
+        </p>
+        <p>
+            Browsers not only display content for error pages, they even run javascript, if any!
+        </p>
+        <p>
+            Although javascript is not necessary, I have to use it on this hosting
+            because it's not mine and I can't configure nginx as I want.
+            I have only custom 404 fallback page and I have to pull content via CGI handler.
+        </p>
+        <p>
+            Otherwise I'd prefer something from 4xx or 5xx.
+        </p>
+        <p>
+            418, yeah.
+        </p>
+        <p>
+            Meow meow meow.
+        </p>
+        <p>
+            Somebody might have done this already.
+        </p>
+        <p>
+            Bots will be cleverer. I should have kept silence.
+        </p>
+        <p>
+            They'll probably kick me out of tilde club for posting this on the orange site.
+        </p>
