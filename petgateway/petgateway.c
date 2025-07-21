@@ -15,7 +15,7 @@
 
 #define MAX_REQUEST_LENGTH  (1024 * 1024 * 1024)  // 1M
 
-#define CONTENT_DIR "/home/petbrain/content"
+_PwValue CONTENT_DIR = PW_STATIC_STRING("/home/petbrain/content");
 
 typedef struct {
     char* name;
@@ -165,28 +165,23 @@ CgiNameMap cgi_params_map[] = {
         return false;
     }
 
-    PwValue content_filename = PW_NULL;
+    PwValue content_filename = PW_STRING("404");
     PwValue referrer = PW_NULL;
-    if (!pw_map_get(env, "HTTP_REFERER", &referrer)) {
-        if (!pw_create_string("404", &content_filename)) {
-            return false;
-        }
-    } else {
+    if (pw_map_get(env, "HTTP_REFERER", &referrer)) {
         // XXX strip base path instead of getting flat basename
         if (!pw_basename(&referrer, &content_filename)) {
             return false;
         }
         if (pw_strlen(&content_filename) == 0) {
-            if (!pw_create_string("000", &content_filename)) {
-                return false;
-            }
+            pw_destroy(&content_filename);
+            content_filename = PwString("000");
         }
     }
     if (!pw_string_append(&content_filename, ".myaw")) {
         return false;
     }
     PwValue full_path = PW_NULL;
-    if (!pw_path(&full_path, pwva(_pw_create_string_ascii, CONTENT_DIR), pw_clone(&content_filename))) {
+    if (!pw_path(&full_path, pw_clone(&CONTENT_DIR), pw_clone(&content_filename))) {
         return false;
     }
 
@@ -199,10 +194,9 @@ CgiNameMap cgi_params_map[] = {
         if (!pw_is_errno(ENOENT)) {
             return false;
         }
-        if (!pw_create_string("404.myaw", &content_filename)) {
-            return false;
-        }
-        if (!pw_path(&full_path, pwva(_pw_create_string_ascii, CONTENT_DIR), pw_clone(&content_filename))) {
+        pw_destroy(&content_filename);
+        content_filename = PwString("404.myaw");
+        if (!pw_path(&full_path, pw_clone(&CONTENT_DIR), pw_clone(&content_filename))) {
             return false;
         }
         if (!pw_file_open(&full_path, O_RDONLY, 0, &file)) {
