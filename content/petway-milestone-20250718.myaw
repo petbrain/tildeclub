@@ -3,15 +3,14 @@ title:
 
 article:
     html::literal:
-        <h1>Revised strings</h1>
+        <h1>Revised strings and generics</h1>
 
         <div class="date">July 18, 2025</div>
 
         <h2>Changes</h2>
 
-        <p>
-            The main change at this milestone is introduction of low-level string iterators.
-        </p>
+        <h3>Low-level string iterators</h3>
+
         <p>
             When strings can have multiple memory layouts and character sizes, picking characters by index is slow operation.
             Low level iterators expose memory layout so the inner code depends only on character size.
@@ -30,9 +29,11 @@ article:
                     and these functions need low-level conterparts to avoid re-scanning UTF-8 strings.</li>
             </ul>
         </p>
+
+        <h3>Merged CharPtr type with String</h3>
+
         <p>
-            Another big change is merging CharPtr type with String.
-            The result is static string.
+            This change resulted is static string.
             This does not mean that string is constant.
             Like other two kinds of strings, embedded and allocated, static strings can be modified thanks to COW.
         </p>
@@ -44,14 +45,30 @@ article:
             They are easy to implement but it would increase the entropy.
             Later, maybe. Depending on use cases.
         </p>
+
+        <h3>Increased bit width for char_size</h3>
+
         <p>
-            Yet another change is increased bit width for char_size and store character size as is, 1-based instead of 0-based.
-            This is another step towards variable-size strings.
+            This allowed storing character size as is, 1-based instead of 0-based.
+            Also, this is another step towards variable-size strings.
             But maybe it should be stored as a shift counter to eliminate multiplications.
             Need to evaluate this on ARM.
         </p>
+
+        <h3>Initializer and rvalue for UTF-32 embedded strings</h3>
+
         <p>
-            Also, added initializer and rvalue for embedded strings PW_STRING_UTF32 and PwStringUtf32 respectively.
+            That's PW_STRING_UTF32 and PwStringUtf32 respectively.
+        </p>
+        <p>
+            There's no support for wide character to avoid stepping into surrogate pairs shit.
+        </p>
+
+        <h3>Replaced UTF-8 wrappers with _ascii versions in generics</h3>
+
+        <p>
+            Clang 16 did not correctly handle char8_t* and char* in generics.
+            Clang 19 does that in the right way.
         </p>
 
         <h2>Future work</h2>
