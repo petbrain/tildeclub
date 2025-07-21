@@ -40,7 +40,7 @@ article:
         <ul>
             <li><span class="date">July 2, 2025</span> <a href="petway-milestone-20250702">A step towards PetLang:
                 revised calling conventions.</a></li>
-            <li><span class="date">July 18, 2025</span> <a href="petway-milestone-20250718">Revised strings.</a></li>
+            <li><span class="date">July 18, 2025</span> <a href="petway-milestone-20250718">Revised strings and generics.</a></li>
         </ul>
 
         <h2>libpussy</h2>
