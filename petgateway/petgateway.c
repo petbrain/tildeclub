@@ -61,9 +61,9 @@ CgiNameMap cgi_params_map[] = {
  */
 {
     if (!pw_map_va(result,
-        PwCharPtr("status"),  PwUnsigned(200),
-        PwCharPtr("headers"), pwva_map(PwCharPtr("Content-Type"), PwCharPtr("application/json")),
-        PwCharPtr("content"), pwva_map(PwCharPtr("status"), PwCharPtr("ok"))
+        PwString("status"),  PwUnsigned(200),
+        PwString("headers"), pwva_map(PwString("Content-Type"), PwStaticString("application/json")),
+        PwString("content"), pwva_map(PwString("status"), PwString("ok"))
     )) {
         return false;
     }
@@ -158,9 +158,9 @@ CgiNameMap cgi_params_map[] = {
     }
 
     if (!pw_map_va(result,
-        PwCharPtr("status"),  PwUnsigned(200),
-        PwCharPtr("headers"), pwva_map(PwCharPtr("Content-Type"), PwCharPtr("application/json")),
-        PwCharPtr("content"), pwva_map(PwCharPtr("status"), PwCharPtr("ok"))
+        PwString("status"),  PwUnsigned(200),
+        PwString("headers"), pwva_map(PwString("Content-Type"), PwStaticString("application/json")),
+        PwString("content"), pwva_map(PwString("status"), PwString("ok"))
     )) {
         return false;
     }
@@ -202,7 +202,7 @@ CgiNameMap cgi_params_map[] = {
         return false;
     }
     if (!pw_get(&title, &page, "title")) {
-        title = PwString(0, {});
+        title = PwString("");
     }
     if (!pw_get(&html, &page, "article", "html")) {
         return false;
@@ -226,9 +226,9 @@ CgiNameMap cgi_params_map[] = {
  */
 {
     if (!pw_map_va(result,
-        PwCharPtr("status"),  PwUnsigned(200),
-        PwCharPtr("headers"), pwva_map(PwCharPtr("Content-Type"), PwCharPtr("application/json")),
-        PwCharPtr("content"), pwva_map(PwCharPtr("status"), PwCharPtr("ok"))
+        PwString("status"),  PwUnsigned(200),
+        PwString("headers"), pwva_map(PwString("Content-Type"), PwStaticString("application/json")),
+        PwString("content"), pwva_map(PwString("status"), PwString("ok"))
     )) {
         return false;
     }

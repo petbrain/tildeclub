@@ -1,0 +1,63 @@
+title:
+    PetWay milestone ~ petbrain ~ tilde.club
+
+article:
+    html::literal:
+        <h1>Revised strings</h1>
+
+        <div class="date">July 18, 2025</div>
+
+        <h2>Changes</h2>
+
+        <p>
+            The main change at this milestone is introduction of low-level string iterators.
+        </p>
+        <p>
+            When strings can have multiple memory layouts and character sizes, picking characters by index is slow operation.
+            Low level iterators expose memory layout so the inner code depends only on character size.
+        </p>
+        <p>
+            This opens a way to variable character size: UTF-8.
+        </p>
+        <p>
+            It would be great if strings supported UTF-8 natively but there are a couple issues:
+            <ul>
+                <li>C compiler does not provide length of UTF-8 string in codepoints,
+                    so it's impossible to initialize PwValue structure without a runtime hack.
+                    Because of this, PwStringUtf8 is now a function that returns PwValue and panics when OOM.</li>
+                <li>Search and substring functions operate with indexes.
+                    In parsing algorithms scanning is followed by substring extraction
+                    and these functions need low-level conterparts to avoid re-scanning UTF-8 strings.</li>
+            </ul>
+        </p>
+        <p>
+            Another big change is merging CharPtr type with String.
+            The result is static string.
+            This does not mean that string is constant.
+            Like other two kinds of strings, embedded and allocated, static strings can be modified thanks to COW.
+        </p>
+        <p>
+            Static string initializers are PW_STATIC_STRING and PW_STATIC_STRING_UTF32.
+            Rvalues are created with a single generic PwStaticString which never fails.
+            It's a function, and it has to call strlen to initialize length.
+            There's no rvalue macros similar to PwString.
+            They are easy to implement but it would increase the entropy.
+            Later, maybe. Depending on use cases.
+        </p>
+        <p>
+            Yet another change is increased bit width for char_size and store character size as is, 1-based instead of 0-based.
+            This is another step towards variable-size strings.
+            But maybe it should be stored as a shift counter to eliminate multiplications.
+            Need to evaluate this on ARM.
+        </p>
+        <p>
+            Also, added initializer and rvalue for embedded strings PW_STRING_UTF32 and PwStringUtf32 respectively.
+        </p>
+
+        <h2>Future work</h2>
+
+        <ul>
+            <li>Iterators: evaluate branchless approach.</li>
+            <li>Add UTF-8 variable character size support.</li>
+            <li>Refactor MYAW and JSON parsers to use iterators instead of picking characters by index.</li>
+        </ul>
