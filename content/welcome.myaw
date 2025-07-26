@@ -59,6 +59,7 @@ article:
         <ul>
             <li><a href="https://github.com/petbrain/pw-curl">pw-curl</a>:
                 PetWay wrapper for Curl and example fetch utility based on PetWay library</li>
+            <li><a href="uncatchable-pet">Uncatchable Pet</a>: security aspects of pet systems</li>
         </ul>
 
         <h1>Notes</h1>

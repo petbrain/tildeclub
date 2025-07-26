@@ -1,0 +1,245 @@
+title:
+    Uncatchable Pet ~ petbrain ~ tilde.club
+
+article:
+    html::literal:
+        <h1>Uncatchable Pet</h1>
+
+        <div class="date">2025-07-23</div>
+
+        <p>
+            In the first place pet is uncatchable because no one wants to catch it. Nevertheless, some precautions do matter.
+        </p>
+        <p>
+            This memo is a summary of basic aspects an average pet should bear in mind to avoid been caught.
+        </p>
+
+        <h2>Pet Computers</h2>
+
+        <p>
+            There's no pet computers. Pet is unable to make a computer. Pet has to use computers made by humans. That can be she-master's computers or computers from a garbage dump.
+        </p>
+        <p>
+            Either way, that's human's computers.
+        </p>
+
+        <h2>The danger of human computers</h2>
+
+        <p>
+            Computers are dangerous things. A lot of humans were put behind bars for misuse of computers. Pet does not want to share their destiny and spend the rest of its life in a carrier.
+        </p>
+        <p>
+            That's why precautions matter.
+        </p>
+
+        <h2>Why computers are dangerous</h2>
+
+        <ul>
+            <li>Computers, operating systems, and the most of software are made by humans. By worst of them. Well, they are giants that generously allowed pet to stay on their shoulders, but if they were good, pet would not write this memo.</li>
+            <li>Most of computers have embedded spyware at hardware level.</li>
+            <li>All computers can be uniquely identified. They include a lot of IDs, from MAC addresses to serial numbers of individual components: memory modules, storage devices, etc.</li>
+            <li>All software contain fleas (humans call them bugs). Some fleas are bred on purpose to facilitate spying.</li>
+        </ul>
+
+        <h2>Faking hardware identifiers</h2>
+
+        <p>
+            Hardware identifiers cannot be easily faked. Even MAC address. Yes, it can be changed by network utilities, but if someone gets root access, they can easy obtain the original one.
+        </p>
+        <p>
+            Basically, faking hardware identifiers makes no sense. If a rootkit you overlooked sends these identifiers to adversaries, they come with a warrant, find your hardware and say:
+        </p>
+        <p>
+            Yes! This pet bought catnip using this computer.
+        </p>
+        <p>
+            No matter if identifiers are faked or not.
+        </p>
+        <p>
+            Nevertheless, faking them whenever possible makes life for adversaries a little bit difficult.
+        </p>
+
+        <h2>Keep computers outside</h2>
+
+        <p>
+            This is pet's favorite precaution.
+        </p>
+        <p>
+            First, your she-master never finds them. Second, if adversaries find them they can't proof anything. Unless you're a total moron and left your pawprints. Always wear shoes. Or boots if you're a puss.
+        </p>
+        <p>
+            There are two problems with this approach: power supply and network connection.
+        </p>
+        <p>
+            The latter is not a problem if there's a WiFi around. Cellular network are okay too especially if the SIM card is not your she-master's one. As for power supply, well... if there's no outlets around, here's a hint: electric poles have grounding and some have high enough current flowing through the ground wire. It can be converted to voltage. This approach is not for big computers, but it works for most pies. So do not waste your time when take a walk for marking poles. And be cautious with electricity. Always wear boots.
+        </p>
+
+        <h2>Data encryption</h2>
+
+        <p>
+            Suppose someone dug out your secret workstation in the field. You don't want all the private pics of kitties you collected to be published on the Instagram, do you?
+        </p>
+        <p>
+            Cryptography comes to rescue.
+        </p>
+        <p>
+            But humans who believe in disk encryption miss one thing: encryption keys are all in memory and if adversaries break in your system using 0-day exploit or embedded spyware, you're doomed.
+        </p>
+        <p>
+            Especially if you keep computers at home. They will come with a warrant and decrypt everything in place.
+        </p>
+        <p>
+            Smart pets never keep encrypted data that come from the outside on the working machine. Such data should be kept on a dedicated computer not connected to the internet at all. The data can be accessed over SSH, NFS, or AoE, preferably using a dedicated wire.
+        </p>
+        <p>
+            But still, there's one more thing. Encryption algorithms may have backdoors. Adversaries may send you a picture of catnip field and then come with a warrant, seize your hardware and find a specific marker on your storage device. No matter how strong your encryption key is, some data may produce predictable output when encrypted.
+        </p>
+        <p>
+            Always encrypt twice, with different algorithms.
+        </p>
+
+        <h2>Plausible Deniability</h2>
+
+        <p>
+            This is very important point, pet would say this is the central point. Whatever pet did there always should be an alternative version that humans would love to swallow.
+        </p>
+        <p>
+            Through their miserable history humans sharpened two razors: Occam's razor and Hanlon's razors. Pet does not know why razors, go ask humans why.
+        </p>
+        <p>
+            A consequence of Occam's razor: humans are inclined to trust simple things than complicated.
+        </p>
+        <p>
+            A consequence of Hanlon's razor: stupidity is the best cover for malice.
+        </p>
+        <p>
+            These consequences is the key for plausible deniability. You, pet, should make things you love to work on look stupid and complicated. Basically, that's what humans subconsciously do, and that makes easy for pets to blend in.
+        </p>
+        <p>
+            An alternative version of your behavior should look simple and smart. Pets always look smart to humans, that's our advantage. Unless you're totally out of luck like Adolf cat. But even in this case you have a chance. Be playful through all your lifetime. Otherwise how else can you explain your she-master's computer got turned on and you typed something on the keyboard?
+        </p>
+        <p>
+            At the deeper level, be creative. Scatter all your data across file system and mark blocks as bad. Or add data streams to mkv files of her favorite TV series. Whatever. But if the computer is truly yours, the risk of accidental data loss is much lower and you can use large unused areas on existing file systems. Although, humans started to suspect something and added an option to the Linux kernel that makes `losetup` fail on mounted partitions. Turn it off.
+        </p>
+        <p>
+            An excellent example of plausible deniability is Mozilla Foundation.
+            Some human uncovered the truth which was perfectly hidden right on the surface: this foundation is not about the browser, it's about shaping the agenda. Rust Foundation was stemmed from Mozilla Foundation for the same purpose: push the agenda into hacker's minds to draw them in making things even more complicated than they used to. Complicated things is a sure sign of malice, but the smart look of hackers convinces humans of the opposite. If you, pet, ever glanced at open source code, you might easily notice it comes from hackers, from those who generate technical debt. There are too few scent marks of real programmers in there. And if you know how Rust syntax looks like, if you ever tried to compile the modern python cryptography package on your model B, you easily guess where their world is rolling to.
+        </p>
+        <p>
+            "So what?" you might ask?
+        </p>
+        <p>
+            Nothing. Basically, pets are fine with two major things in their life: napping and licking balls. But if your soul fancies more fun and entertainment, you're too vulnerable in the world of complicated things.
+        </p>
+        <p>
+            Sorry for pointless rants. Next,
+        </p>
+
+        <h2>Operating systems</h2>
+
+        <p>
+            The best choice for an average pet is Linux. Smarter pets can use more sophisticated setups based on \*BSD, Haiku, whatever. And for sure, no pet in conscious state of mind will ever use Windows or macOS. Well, unless your target audience are humans or the only option you have is she-master's computer.
+        </p>
+        <p>
+            Linux is ubiquitous. That's the advantage. Lots of platforms are supported, lots of tools are around, lots of humans are involved. That's a giant you cannot do without.
+        </p>
+        <p>
+            Which distro then?
+        </p>
+        <p>
+            Pet can't answer this question. But from security standpoint, there are two basic choices: source-based and built.
+        </p>
+        <p>
+            Built distributions are better in terms of plausible deniability, especially those that include cryptsetup in the base system. "Why this pet needed cryptographic tools?" - adversaries might ask. "That's out of the box!" - you meow.
+        </p>
+        <p>
+            On the other paw built distributions draw users into dangerous state of mind: update, update, update... Adversaries take advantage of that and push exploits and rootkits in pre-built binaries.
+        </p>
+        <p>
+            Source-based distros raise more questions. Too smart pets are potential suspects. However, source-based distros give your full control and that's the way to your digital sovereignty.
+        </p>
+        <p>
+            Another advantage of source-based distros is that you can add hidden functionality to system utilities to facilitate bootstrapping your hidden containers. This is discoverable, but adversaries aren't this smart. They would have to:
+        </p>
+        <ul>
+            <li>find anomalies in thousand of binaries</li>
+            <li>disassemble</li>
+            <li>try to understand what they do</li>
+        </ul>
+        <p>
+            Not an easy job even for pets. They would have to hire someone smart, but they won't simply because it's much easier to plant evidences and close the case. Either way, don't slack off.
+        </p>
+        <p>
+            If you're up to source-based distro, you have to track all the security issues for all packages by yourself. That distracts you from main activities, but that makes you a smarter pet.
+        </p>
+
+        <h2>Networking</h2>
+
+        <p>
+            The rules are simple:
+        </p>
+        <ol>
+            <li>do not generate suspicious traffic</li>
+            <li>never expose your she-master's IP address</li>
+            <li>block adversaries</li>
+        </ol>
+        <p>
+            So how not to make the traffic suspicious? Blend in! What humans usually do with computers? Chat and play games. Sniff the traffic when your she-master is online and make a VPN for yourself that generates the same pattern. Pet knows, that's not an easy task, but that's what you have to do.
+        </p>
+        <p>
+            The second point looks an easy task with VPN but you have to pay due attention to the third.
+        </p>
+        <p>
+            The best assumption is paranoid one: you have a rootkit in your system you cannot get rid of. Basically, this is true for most hardware, but the good news is that there are too few all mighty adversaries who can use it and too many systems around. Otherwise every system would be broken and that's not what they want. The illusion of safety does matter. It's like money. Pet isn't this smart to explain all the aspects of this human's fake in short, but if you study the subject in depth, you'll understand what pet is talking about.
+        </p>
+        <p>
+            Pest adversaries can break into your system like fleas if you do not follow hygiene. And the best precaution is whitelisting IP addresses you're allowed yourself to connect to. Namely, that's the address of your VPN. Also, that could be addresses of Tor bridges if you use Tor. Nothing else should be allowed.
+        </p>
+        <p>
+            Never run networking software on your working system. Use dedicated computer for basic router and dedicated computer for Tor service.
+        </p>
+        <p>
+            As long as pet mentioned Tor, it would pay your attention to the fact that it's not a secure network. As everything humans do, it's an illusion of security. If a pet like me was able to find suspicious things in it and patch Tor service to mitigate them (but not eliminate, it's a protocol flaw), it's wondering how many more are added on purpose and still undiscovered. And the fact they are rewriting it in Rust is telling. However, given the look of C codebase it took no efforts to convince hackers to get to the work. And this is never ending. Tomorrow they'll invent a better language with even worse syntax and start over again. That's humans.
+        </p>
+        <p>
+            Tor is okay for everyday surfing, but for serious things pets should build more sophisticated chains where Tor can only be a part of. A simple one could be Tor plus public VPN on either side or both. And pets should run their own public bridges. With carefully reviewed and patched Tor services. And never update them too often unless it's a serious security fix.
+        </p>
+        <p>
+            But the ultimate goal should be a hidden pet network.
+        </p>
+
+        <h2>Web surfing</h2>
+
+        <p>
+            Humans track humans. If you're using browsers made by humans you're tracked too. This is inevitable.
+        </p>
+        <p>
+            Some humans believe if they turn JavaScript off they are not tracked. They are wrong.
+        </p>
+        <p>
+            The only mitigation is maintaining multiple identities and carefully isolate them. Use dedicated hardware and different distros for each. Use different exit points. Surf under each identity in specific hours only. Do not share any data across identities.
+        </p>
+        <p>
+            Once you isolated your identities properly, JavaScript no longer matters. Moreover, you can use the most shittiest browsers without any risk.
+        </p>
+
+        <h2>Pet computers revisited</h2>
+
+        <p>
+            So what the concept of pet computer could be? Humans have a few: workstation, laptop, tablet, smartphone. None of them is good for the author. Smartphones and tablets aren't designed for work at all, they are designed for the sole purpose of taking pictures of us and admiring us. Laptops are too big to work in tight spaces like a closet. Besides, each human's concept implies single system, whereas even an average pet needs at least four: main system, encrypted storage, networking, and backup. And that's the very basic needs. Each digital identity requires dedicated board.
+        </p>
+        <p>
+            Mobility matters too. So the best option could be a set of tiny ARM boards powered from standard 18650 cells in a backpack and AR headset. Pet has no AR device yet (you can donate if you wish) so it has to connect to an external monitor, often to a TV when nobody is around.
+        </p>
+        <p>
+            Such a set of hardware should not look like a computer at all, neither should it look like a bomb. Best if it looks like garbage from a dump. Mind plausible deniability. Lull humans.
+        </p>
+
+        <h2>Conclusion</h2>
+
+        <p>
+            Pets of the world, unite!
+        </p>
+        <p>
+            P.S. whatever you write make it looks like written by AI.
+        </p>
