@@ -237,96 +237,31 @@ CgiNameMap cgi_params_map[] = {
     )) {
         return false;
     }
-    int log_fd = open("/var/log/nginx/access.log", O_RDONLY);
-    if (log_fd == -1) {
-        pw_set_status(PwErrno(errno));
+    PwValue log_file = PW_NULL;
+    if (!pw_file_open("/var/log/nginx/access.log", O_RDONLY, 0, &log_file)) {
+        return false;
+    }
+    if (!pw_start_read_lines(&log_file)) {
         return false;
     }
     int my_fd = open("/home/petbrain/public_html/tw.myaw/test/nginx-access.log", O_CREAT | O_WRONLY, 0644);
     if (my_fd == -1) {
-        close(log_fd);
         pw_set_status(PwErrno(errno));
         return false;
     }
 
-    // get records in reverse order, time limit is 30s
-
-    // XXX it takes less than 30 seconds for full month log, rewrite this mess in a straightforward way.
-
-    // XXX maybe save position for subsequent extraction, maybe extract daily
-
-    off_t pos = lseek(log_fd, -0, SEEK_END);
-    if (pos == -1) {
-        close(my_fd);
-        close(log_fd);
-        pw_set_status(PwErrno(errno));
-        return false;
-    }
-    time_t start_time = time(NULL);
-    char buf[1024];
-    char prev_tail[1024];
-    unsigned prev_tail_len = 0;
-    char tail[1024];
-    unsigned tail_len = 0;
-    pos &= ~1023L;
-    while (pos && (time(NULL) < (start_time + 30))) {
-        pos -= sizeof(buf);
-        if (lseek(log_fd, pos, SEEK_SET) == -1) {
-            close(my_fd);
-            close(log_fd);
-            pw_set_status(PwErrno(errno));
-            return false;
+    for (;;) {{
+        PwValue line = PW_NULL;
+        if (!pw_read_line(&log_file, &line)) {
+            break;
         }
-        ssize_t bytes_read = read(log_fd, buf, sizeof(buf));
-        if (bytes_read != sizeof(buf)) {
-            close(my_fd);
-            close(log_fd);
-            pw_set_status(PwErrno(errno));
-            return false;
+        if (pw_strstr(&line, "/~petbrain/", 0, nullptr)) {
+            unsigned n;
+            uint8_t* ptr = _pw_string_start_length(&line, &n);
+            write(my_fd, ptr, n * line.char_size);
         }
-        char* lf = memchr(buf, '\n', sizeof(buf));
-        if (!lf) {
-            // line too long, restart
-            tail_len = 0;
-            continue;
-        }
-        lf++;
-        if (tail_len) {
-            memcpy(prev_tail, tail, tail_len);
-        }
-        prev_tail_len = tail_len;
-        tail_len = lf - buf;
-        if (tail_len) {
-            memcpy(tail, buf, tail_len);
-        }
-        unsigned offset = tail_len;
-        while (offset < sizeof(buf)) {
-            char strbuf[2048];
-            unsigned rem = sizeof(buf) - offset;
-            lf = memchr(buf + offset, '\n', rem);
-            if (!lf) {
-                memcpy(strbuf, buf + offset, rem);
-                if (prev_tail_len) {
-                    memcpy(strbuf + rem, prev_tail, prev_tail_len);
-                }
-                strbuf[rem + prev_tail_len] = 0;
-                if (strstr(strbuf, "GET /~petbrain/")) {
-                    write(my_fd, strbuf, rem + prev_tail_len);
-                }
-                break;
-            }
-            lf++;
-            unsigned len = (lf - buf) - offset;
-            memcpy(strbuf, buf + offset, len);
-            strbuf[len] = 0;
-            if (strstr(strbuf, "GET /~petbrain/")) {
-                write(my_fd, strbuf, len);
-            }
-            offset += len;
-        }
-    }
+    }}
     close(my_fd);
-    close(log_fd);
 
     return true;
 }
