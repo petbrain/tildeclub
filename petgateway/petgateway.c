@@ -319,8 +319,7 @@ Method methods[] = {
     }
 
     // read stdin into string
-
-    // XXX PetWay file needs concept of encoding, maybe
+    // PetWay assumes encoding is UTF-8
 
     char8_t* input_data = allocate(content_length + 1, false);
     if (!input_data) {
