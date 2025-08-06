@@ -1,0 +1,61 @@
+title:
+    PetWay milestone ~ petbrain ~ tilde.club
+
+article:
+    html::literal:
+        <h1>Revised strings</h1>
+
+        <div class="date">August 5, 2025</div>
+
+        <h2>Changes</h2>
+
+        <p>
+            At previous milestone pet introduced low level iterators and used them in many low-level functions.
+            Basically, iterators are good, but the approach is not.
+            The main problem is _pw_get_char function that contains switch operator.
+        </p>
+        <p>
+            At this milestone pet refactored string functions, avoiding _pw_get_char in the inner loops.
+        </p>
+        <p>
+            The source file pw_string.c is split into small files which now reside in src/string subdirectory.
+        </p>
+        <p>
+            An attempt was made to optimize basic string operations, but memchr/memcmp from Glibc are superior.
+            Compared strstr performance with Stringzilla sz_find on x86_64 and ARM64 boards pet had at paw.
+            Stringzilla displayed worse performance than Glibc on substring search.
+            PetWay version has almost the same performance as Stringzilla on ARM64 and slightly worse than Glibc on x86_64.
+            That's not bad given the variety of character sizes it's capable to handle.
+        </p>
+
+        <h2>Missing C features</h2>
+
+        <p>
+            Pet discovered interesting problems in C related to static strings.
+        </p>
+        <p>
+            First, static strings are unaligned.
+            That's anticipated, as long as characters take one byte so the can start on a byte boundary.
+            However, there's no way to specify alignment, especially if string literal is passed as an argument,
+            like <code>foo("bar")</code>
+        </p>
+        <p>
+            A workaround is to define an array with desired alignment and initialize it with a string literal,
+            but that's too verbose for pet.
+        </p>
+        <p>
+            Second, there's no way to distinguish <code>char*</code> argument from a string literal in macros.
+        </p>
+        <p>
+            Third, there's no way to know the length of UTF-8 string literal in codepoints at compile time.
+        </p>
+
+        <h2>Future work</h2>
+
+        <p>
+            From previous milestone:
+        </p>
+        <ul>
+            <li>Add UTF-8 variable character size support.</li>
+            <li>Refactor MYAW and JSON parsers to use iterators instead of picking characters by index.</li>
+        </ul>

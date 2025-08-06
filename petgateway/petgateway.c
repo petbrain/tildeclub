@@ -88,7 +88,7 @@ CgiNameMap cgi_params_map[] = {
                                "\n" \
                                "items:\n";
 
-        if (!pw_write_exact(&log_file, header, sizeof(header) - 1)) {
+        if (!pw_write(&log_file, header, sizeof(header) - 1, nullptr)) {
             return false;
         }
     }
@@ -116,7 +116,7 @@ CgiNameMap cgi_params_map[] = {
         pw_set_status(PwStatus(PW_ERROR));
         return false;
     }
-    if (!pw_write_exact(&log_file, buf, n)) {
+    if (!pw_write(&log_file, buf, n, nullptr)) {
         return false;
     }
 
@@ -126,20 +126,20 @@ CgiNameMap cgi_params_map[] = {
             continue;
         }
         char* param_name = cgi_params_map[i].log_param_name;
-        if (!pw_write_exact(&log_file, "        ", 8)) {
+        if (!pw_writw(&log_file, "        ", 8, nullptr)) {
             return false;
         }
-        if (!pw_write_exact(&log_file, param_name, strlen(param_name))) {
+        if (!pw_write(&log_file, param_name, strlen(param_name), nullptr)) {
             return false;
         }
-        if (!pw_write_exact(&log_file, ": ", 2)) {
+        if (!pw_write(&log_file, ": ", 2, nullptr)) {
             return false;
         }
         PW_CSTRING_LOCAL(val, &value);
-        if (!pw_write_exact(&log_file, val, sizeof(val) - 1)) {
+        if (!pw_write(&log_file, val, sizeof(val) - 1, nullptr)) {
             return false;
         }
-        if (!pw_write_exact(&log_file, "\n", 1)) {
+        if (!pw_write(&log_file, "\n", 1, nullptr)) {
             return false;
         }
     }}
@@ -420,7 +420,7 @@ Method methods[] = {
     if (n < 0) {
         pw_set_status(PwStatus(PW_ERROR));
     }
-    if (!pw_write_exact(&output, status_buf, n)) {
+    if (!pw_write(&output, status_buf, n, nullptr)) {
         return false;
     }
 
@@ -433,21 +433,21 @@ Method methods[] = {
         if (pw_map_item(&headers, i, &key, &value)) {
             {
                 PW_CSTRING_LOCAL(k, &key);
-                if (!pw_write_exact(&output, k, sizeof(k) - 1)) {
+                if (!pw_write(&output, k, sizeof(k) - 1, nullptr)) {
                 }
             }
-            if (!pw_write_exact(&output, ": ", 2)) {
+            if (!pw_write(&output, ": ", 2, nullptr)) {
             }
             {
                 PW_CSTRING_LOCAL(v, &value);
-                if (!pw_write_exact(&output, v, sizeof(v) - 1)) {
+                if (!pw_write(&output, v, sizeof(v) - 1, nullptr)) {
                 }
             }
-            if (!pw_write_exact(&output, "\n", 1)) {
+            if (!pw_write(&output, "\n", 1, nullptr)) {
             }
         }
     }}
-    if (!pw_write_exact(&output, "\n", 1)) {
+    if (!pw_write(&output, "\n", 1, nullptr)) {
     }
     if (!pw_to_json_file(&content, 0, &output)) {
     }
